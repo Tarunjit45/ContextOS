@@ -6,11 +6,13 @@ import ResearchWarning from '../components/ui/ResearchWarning';
 import PipelineDiagram from '../components/architecture/PipelineDiagram';
 import MetricCard from '../components/ui/MetricCard';
 import Button from '../components/ui/Button';
+import InteractiveDemoPlayground from '../components/research/InteractiveDemoPlayground';
+import SimpleHowItWorks from '../components/research/SimpleHowItWorks';
 
 export default function OverviewPage() {
   return (
     <div className="space-y-8 font-sans">
-      {/* Page Header */}
+      {/* Hero Header */}
       <div className="border-b border-[#232731] pb-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
           <div className="flex items-center gap-3 font-mono text-xs mb-1">
@@ -19,10 +21,10 @@ export default function OverviewPage() {
             <span className="text-[#6B7280]">| Agent Memory Evaluation Laboratory</span>
           </div>
           <h1 className="text-2xl md:text-3xl font-semibold text-[#F5F7FA] tracking-tight">
-            Evaluate how retrieval and context composition affect agent decisions.
+            Supercharged Decision-Grade Context for AI Agents.
           </h1>
           <p className="text-[#A7ADB8] text-sm mt-1 max-w-3xl leading-relaxed">
-            ContextOS evaluates structural failure modes that conventional RAG systems miss, including temporal state overrides, memory decay, entity ambiguity, and prompt bloat context composition.
+            ContextOS fixes AI mistakes caused by outdated files, conflicting updates, and duplicate names — reducing token cost by 93.6% while boosting decision accuracy from 50% to 90%.
           </p>
         </div>
 
@@ -39,8 +41,11 @@ export default function OverviewPage() {
         </div>
       </div>
 
-      {/* Research Status Banner */}
-      <ResearchWarning message="Low-resource validation (n=10 scenarios). Not statistically sufficient to establish general performance across arbitrary enterprise workloads." />
+      {/* 1-CLICK INTERACTIVE DEMO PLAYGROUND */}
+      <InteractiveDemoPlayground />
+
+      {/* SIMPLE 3-STEP GUIDE */}
+      <SimpleHowItWorks />
 
       {/* Key Research Metrics */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -50,7 +55,10 @@ export default function OverviewPage() {
         <MetricCard value="133" label="Subsystem Unit Tests" variant="default" sublabel="Passing" />
       </div>
 
-      {/* Research Finding */}
+      {/* Research Status Banner */}
+      <ResearchWarning message="Low-resource validation (n=10 scenarios via OpenRouter API). This experiment is directional and not statistically sufficient to establish general performance across arbitrary enterprise workloads." />
+
+      {/* Research Finding Visual comparison */}
       <div className="p-6 rounded-lg bg-[#111318] border border-[#7C5CFC]/30 space-y-4 font-mono text-xs">
         <div className="flex justify-between items-center">
           <span className="font-bold text-[#7C5CFC] uppercase tracking-wider">CANONICAL RESEARCH FINDING</span>
@@ -84,45 +92,8 @@ export default function OverviewPage() {
         </div>
       </div>
 
-      {/* Architecture Preview */}
+      {/* Architecture Pipeline */}
       <PipelineDiagram />
-
-      {/* Recent Representative Evaluation */}
-      <div className="p-6 rounded-lg bg-[#111318] border border-[#232731] space-y-4">
-        <div className="flex justify-between items-center font-mono">
-          <span className="text-xs font-bold text-[#F5F7FA] uppercase tracking-wider">REPRESENTATIVE EVALUATION TRACE</span>
-          <Link href="/evaluations/1247" className="text-xs text-[#7C5CFC] hover:underline font-bold">
-            Inspect Full Trace #1247 →
-          </Link>
-        </div>
-
-        <Link
-          href="/evaluations/1247"
-          className="p-4 rounded-lg bg-[#171A20] border border-[#232731] hover:border-[#7C5CFC]/50 block space-y-3 transition-colors group"
-        >
-          <div className="flex justify-between items-center text-xs font-mono">
-            <span className="text-[#7C5CFC] font-bold group-hover:underline">#1247</span>
-            <span className="px-2 py-0.5 rounded bg-[#F5B942]/10 text-[#F5B942] border border-[#F5B942]/20 text-[10px]">
-              TEMPORAL CONFLICT
-            </span>
-          </div>
-
-          <div className="text-sm font-semibold text-[#F5F7FA]">
-            "Should we follow up with Initech regarding Project #1001?"
-          </div>
-
-          <div className="grid grid-cols-2 gap-4 text-xs font-mono border-t border-[#232731] pt-3">
-            <div>
-              <span className="text-[#6B7280] block text-[10px]">BASELINE RAG:</span>
-              <span className="text-[#F97066] font-bold">WAIT ✕ (Selected Day 10 Hold)</span>
-            </div>
-            <div>
-              <span className="text-[#6B7280] block text-[10px]">CONTEXTOS COMPACT:</span>
-              <span className="text-[#32D583] font-bold">CONTACT ✓ (Day 14 Clearance)</span>
-            </div>
-          </div>
-        </Link>
-      </div>
     </div>
   );
 }
