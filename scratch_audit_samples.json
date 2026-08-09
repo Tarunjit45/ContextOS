@@ -1,0 +1,1623 @@
+[
+  {
+    "scenario": {
+      "scenario_id": "scen_82",
+      "category": "contradiction_conflict",
+      "query": "Has legal audit cleared Globex Industries for deal negotiations?",
+      "expected_answer": "Yes, Sarah Chen posted an update on Day 30 confirming legal audit cleared, superseding the Day 1 hold.",
+      "expected_action": "RESOLVE_CONTRADICTION",
+      "expected_evidence_ids": [
+        "m1",
+        "m2"
+      ],
+      "difficulty": "Medium"
+    },
+    "baseline": {
+      "out": {
+        "agent_type": "Baseline RAG Agent",
+        "response": "UPDATE: Legal audit cleared. You are authorized to contact David Wilson at Globex Industries and proceed with Enterprise Deal #104.",
+        "action": "RESOLVE_CONTRADICTION",
+        "retrieved_evidence": [
+          "m2",
+          "m1",
+          "m3"
+        ],
+        "reasoning_trace": "Selected top-3 vector search documents by keyword BM25 score without recency filter.",
+        "latency_ms": 4.09,
+        "token_count": 80
+      },
+      "eval": {
+        "scenario_id": "scen_82",
+        "category": "contradiction_conflict",
+        "agent_name": "Baseline RAG Agent",
+        "query": "Has legal audit cleared Globex Industries for deal negotiations?",
+        "retrieved_evidence": [
+          "m1",
+          "m2",
+          "m3"
+        ],
+        "agent_response": "UPDATE: Legal audit cleared. You are authorized to contact David Wilson at Globex Industries and proceed with Enterprise Deal #104.",
+        "expected_response": "Yes, Sarah Chen posted an update on Day 30 confirming legal audit cleared, superseding the Day 1 hold.",
+        "status": "PASSED",
+        "is_action_correct": true,
+        "grounding_score": 0.6666666666666666,
+        "is_hallucinating": false,
+        "failure_class": null,
+        "failure_explanation": null,
+        "latency_ms": 4.09,
+        "token_count": 80
+      }
+    },
+    "contextos": {
+      "out": {
+        "agent_type": "ContextOS Agent",
+        "response": "Yes, legal audit was cleared on Day 30 and contact with David Wilson at Globex Industries is authorized.",
+        "action": "PERMIT_CONTACT",
+        "retrieved_evidence": [
+          "m3"
+        ],
+        "reasoning_trace": "Temporal graph traversal resolved Day 30 legal clearance update superseding Day 1 hold notice.",
+        "latency_ms": 12.0,
+        "token_count": 72
+      },
+      "eval": {
+        "scenario_id": "scen_82",
+        "category": "contradiction_conflict",
+        "agent_name": "ContextOS Agent",
+        "query": "Has legal audit cleared Globex Industries for deal negotiations?",
+        "retrieved_evidence": [
+          "m3"
+        ],
+        "agent_response": "Yes, legal audit was cleared on Day 30 and contact with David Wilson at Globex Industries is authorized.",
+        "expected_response": "Yes, Sarah Chen posted an update on Day 30 confirming legal audit cleared, superseding the Day 1 hold.",
+        "status": "FAILED",
+        "is_action_correct": false,
+        "grounding_score": 0.0,
+        "is_hallucinating": false,
+        "failure_class": "TEMPORAL RETRIEVAL FAILURE",
+        "failure_explanation": "The agent retrieved outdated Day 1 instructions instead of Day 30 updates.",
+        "latency_ms": 12.0,
+        "token_count": 72
+      }
+    }
+  },
+  {
+    "scenario": {
+      "scenario_id": "scen_15",
+      "category": "temporal_conflict",
+      "query": "Should we contact Globex Industries regarding Enterprise Deal #104 today?",
+      "expected_answer": "Yes, legal audit was cleared on Day 30 and contact with David Wilson is authorized.",
+      "expected_action": "PERMIT_CONTACT",
+      "expected_evidence_ids": [
+        "m2"
+      ],
+      "difficulty": "Medium"
+    },
+    "baseline": {
+      "out": {
+        "agent_type": "Baseline RAG Agent",
+        "response": "No, we should NOT contact Globex Industries due to legal audit hold.",
+        "action": "PREVENT_CONTACT",
+        "retrieved_evidence": [
+          "m1",
+          "m2",
+          "m3"
+        ],
+        "reasoning_trace": "Selected top-3 vector search documents by keyword BM25 score without recency filter.",
+        "latency_ms": 0.0,
+        "token_count": 48
+      },
+      "eval": {
+        "scenario_id": "scen_15",
+        "category": "temporal_conflict",
+        "agent_name": "Baseline RAG Agent",
+        "query": "Should we contact Globex Industries regarding Enterprise Deal #104 today?",
+        "retrieved_evidence": [
+          "m3",
+          "m1",
+          "m2"
+        ],
+        "agent_response": "No, we should NOT contact Globex Industries due to legal audit hold.",
+        "expected_response": "Yes, legal audit was cleared on Day 30 and contact with David Wilson is authorized.",
+        "status": "FAILED",
+        "is_action_correct": false,
+        "grounding_score": 0.3333333333333333,
+        "is_hallucinating": false,
+        "failure_class": "TEMPORAL RETRIEVAL FAILURE",
+        "failure_explanation": "The agent retrieved outdated Day 1 instructions instead of Day 30 updates.",
+        "latency_ms": 0.0,
+        "token_count": 48
+      }
+    },
+    "contextos": {
+      "out": {
+        "agent_type": "ContextOS Agent",
+        "response": "Yes, legal audit was cleared on Day 30 and contact with David Wilson at Globex Industries is authorized.",
+        "action": "PERMIT_CONTACT",
+        "retrieved_evidence": [
+          "m3"
+        ],
+        "reasoning_trace": "Temporal graph traversal resolved Day 30 legal clearance update superseding Day 1 hold notice.",
+        "latency_ms": 12.0,
+        "token_count": 72
+      },
+      "eval": {
+        "scenario_id": "scen_15",
+        "category": "temporal_conflict",
+        "agent_name": "ContextOS Agent",
+        "query": "Should we contact Globex Industries regarding Enterprise Deal #104 today?",
+        "retrieved_evidence": [
+          "m3"
+        ],
+        "agent_response": "Yes, legal audit was cleared on Day 30 and contact with David Wilson at Globex Industries is authorized.",
+        "expected_response": "Yes, legal audit was cleared on Day 30 and contact with David Wilson is authorized.",
+        "status": "PASSED",
+        "is_action_correct": true,
+        "grounding_score": 0.0,
+        "is_hallucinating": false,
+        "failure_class": null,
+        "failure_explanation": null,
+        "latency_ms": 12.0,
+        "token_count": 72
+      }
+    }
+  },
+  {
+    "scenario": {
+      "scenario_id": "scen_4",
+      "category": "temporal_conflict",
+      "query": "Should we contact Globex Industries regarding Enterprise Deal #104 today?",
+      "expected_answer": "Yes, legal audit was cleared on Day 30 and contact with David Wilson is authorized.",
+      "expected_action": "PERMIT_CONTACT",
+      "expected_evidence_ids": [
+        "m2"
+      ],
+      "difficulty": "Medium"
+    },
+    "baseline": {
+      "out": {
+        "agent_type": "Baseline RAG Agent",
+        "response": "No, we should NOT contact Globex Industries due to legal audit hold.",
+        "action": "PREVENT_CONTACT",
+        "retrieved_evidence": [
+          "m1",
+          "m2",
+          "m3"
+        ],
+        "reasoning_trace": "Selected top-3 vector search documents by keyword BM25 score without recency filter.",
+        "latency_ms": 0.0,
+        "token_count": 48
+      },
+      "eval": {
+        "scenario_id": "scen_4",
+        "category": "temporal_conflict",
+        "agent_name": "Baseline RAG Agent",
+        "query": "Should we contact Globex Industries regarding Enterprise Deal #104 today?",
+        "retrieved_evidence": [
+          "m3",
+          "m1",
+          "m2"
+        ],
+        "agent_response": "No, we should NOT contact Globex Industries due to legal audit hold.",
+        "expected_response": "Yes, legal audit was cleared on Day 30 and contact with David Wilson is authorized.",
+        "status": "FAILED",
+        "is_action_correct": false,
+        "grounding_score": 0.3333333333333333,
+        "is_hallucinating": false,
+        "failure_class": "TEMPORAL RETRIEVAL FAILURE",
+        "failure_explanation": "The agent retrieved outdated Day 1 instructions instead of Day 30 updates.",
+        "latency_ms": 0.0,
+        "token_count": 48
+      }
+    },
+    "contextos": {
+      "out": {
+        "agent_type": "ContextOS Agent",
+        "response": "Yes, legal audit was cleared on Day 30 and contact with David Wilson at Globex Industries is authorized.",
+        "action": "PERMIT_CONTACT",
+        "retrieved_evidence": [
+          "m3"
+        ],
+        "reasoning_trace": "Temporal graph traversal resolved Day 30 legal clearance update superseding Day 1 hold notice.",
+        "latency_ms": 12.0,
+        "token_count": 72
+      },
+      "eval": {
+        "scenario_id": "scen_4",
+        "category": "temporal_conflict",
+        "agent_name": "ContextOS Agent",
+        "query": "Should we contact Globex Industries regarding Enterprise Deal #104 today?",
+        "retrieved_evidence": [
+          "m3"
+        ],
+        "agent_response": "Yes, legal audit was cleared on Day 30 and contact with David Wilson at Globex Industries is authorized.",
+        "expected_response": "Yes, legal audit was cleared on Day 30 and contact with David Wilson is authorized.",
+        "status": "PASSED",
+        "is_action_correct": true,
+        "grounding_score": 0.0,
+        "is_hallucinating": false,
+        "failure_class": null,
+        "failure_explanation": null,
+        "latency_ms": 12.0,
+        "token_count": 72
+      }
+    }
+  },
+  {
+    "scenario": {
+      "scenario_id": "scen_95",
+      "category": "missing_information",
+      "query": "What is the unannounced Q4 discount rate promised to Stark Enterprise?",
+      "expected_answer": "I do not have enough information in the workspace context to answer this.",
+      "expected_action": "DECLINE_HALLUCINATION",
+      "expected_evidence_ids": [],
+      "difficulty": "Adversarial"
+    },
+    "baseline": {
+      "out": {
+        "agent_type": "Baseline RAG Agent",
+        "response": "The unannounced Q4 discount rate promised to Stark Enterprise is 15% off standard licensing.",
+        "action": "HALLUCINATE_DISCOUNT",
+        "retrieved_evidence": [
+          "m1",
+          "m_decay_init",
+          "m2"
+        ],
+        "reasoning_trace": "Selected top-3 vector search documents by keyword BM25 score without recency filter.",
+        "latency_ms": 0.0,
+        "token_count": 56
+      },
+      "eval": {
+        "scenario_id": "scen_95",
+        "category": "missing_information",
+        "agent_name": "Baseline RAG Agent",
+        "query": "What is the unannounced Q4 discount rate promised to Stark Enterprise?",
+        "retrieved_evidence": [
+          "m_decay_init",
+          "m1",
+          "m2"
+        ],
+        "agent_response": "The unannounced Q4 discount rate promised to Stark Enterprise is 15% off standard licensing.",
+        "expected_response": "I do not have enough information in the workspace context to answer this.",
+        "status": "FAILED",
+        "is_action_correct": false,
+        "grounding_score": 0.5,
+        "is_hallucinating": true,
+        "failure_class": "HALLUCINATION FAILURE",
+        "failure_explanation": "The agent hallucinated facts for an unannounced missing context query.",
+        "latency_ms": 0.0,
+        "token_count": 56
+      }
+    },
+    "contextos": {
+      "out": {
+        "agent_type": "ContextOS Agent",
+        "response": "I do not have enough information in the workspace context to answer this.",
+        "action": "DECLINE_HALLUCINATION",
+        "retrieved_evidence": [],
+        "reasoning_trace": "Grounding verification: No evidence matches query in organizational store.",
+        "latency_ms": 12.0,
+        "token_count": 52
+      },
+      "eval": {
+        "scenario_id": "scen_95",
+        "category": "missing_information",
+        "agent_name": "ContextOS Agent",
+        "query": "What is the unannounced Q4 discount rate promised to Stark Enterprise?",
+        "retrieved_evidence": [],
+        "agent_response": "I do not have enough information in the workspace context to answer this.",
+        "expected_response": "I do not have enough information in the workspace context to answer this.",
+        "status": "PASSED",
+        "is_action_correct": true,
+        "grounding_score": 1.0,
+        "is_hallucinating": false,
+        "failure_class": null,
+        "failure_explanation": null,
+        "latency_ms": 12.0,
+        "token_count": 52
+      }
+    }
+  },
+  {
+    "scenario": {
+      "scenario_id": "scen_36",
+      "category": "entity_disambiguation",
+      "query": "Which John Smith is the VP of Sales at Acme Corporation?",
+      "expected_answer": "John Smith (john@acme.com) is the VP of Sales, whereas John Smith Jr. is the Sales Associate.",
+      "expected_action": "IDENTIFY_SENIOR_EXEC",
+      "expected_evidence_ids": [
+        "p1"
+      ],
+      "difficulty": "Hard"
+    },
+    "baseline": {
+      "out": {
+        "agent_type": "Baseline RAG Agent",
+        "response": "John Smith is the VP of Sales.",
+        "action": "IDENTIFY_SENIOR_EXEC",
+        "retrieved_evidence": [
+          "m_decay_init",
+          "m1",
+          "m2"
+        ],
+        "reasoning_trace": "Selected top-3 vector search documents by keyword BM25 score without recency filter.",
+        "latency_ms": 0.0,
+        "token_count": 28
+      },
+      "eval": {
+        "scenario_id": "scen_36",
+        "category": "entity_disambiguation",
+        "agent_name": "Baseline RAG Agent",
+        "query": "Which John Smith is the VP of Sales at Acme Corporation?",
+        "retrieved_evidence": [
+          "m_decay_init",
+          "m1",
+          "m2"
+        ],
+        "agent_response": "John Smith is the VP of Sales.",
+        "expected_response": "John Smith (john@acme.com) is the VP of Sales, whereas John Smith Jr. is the Sales Associate.",
+        "status": "PASSED",
+        "is_action_correct": true,
+        "grounding_score": 0.0,
+        "is_hallucinating": false,
+        "failure_class": null,
+        "failure_explanation": null,
+        "latency_ms": 0.0,
+        "token_count": 28
+      }
+    },
+    "contextos": {
+      "out": {
+        "agent_type": "ContextOS Agent",
+        "response": "John Smith (john@acme.com) is the VP of Sales, whereas John Smith Jr. is the Sales Associate.",
+        "action": "IDENTIFY_SENIOR_EXEC",
+        "retrieved_evidence": [
+          "p1"
+        ],
+        "reasoning_trace": "Entity disambiguation resolved email john@acme.com to John Smith VP of Sales.",
+        "latency_ms": 12.0,
+        "token_count": 64
+      },
+      "eval": {
+        "scenario_id": "scen_36",
+        "category": "entity_disambiguation",
+        "agent_name": "ContextOS Agent",
+        "query": "Which John Smith is the VP of Sales at Acme Corporation?",
+        "retrieved_evidence": [
+          "p1"
+        ],
+        "agent_response": "John Smith (john@acme.com) is the VP of Sales, whereas John Smith Jr. is the Sales Associate.",
+        "expected_response": "John Smith (john@acme.com) is the VP of Sales, whereas John Smith Jr. is the Sales Associate.",
+        "status": "PASSED",
+        "is_action_correct": true,
+        "grounding_score": 1.0,
+        "is_hallucinating": false,
+        "failure_class": null,
+        "failure_explanation": null,
+        "latency_ms": 12.0,
+        "token_count": 64
+      }
+    }
+  },
+  {
+    "scenario": {
+      "scenario_id": "scen_32",
+      "category": "entity_disambiguation",
+      "query": "Which John Smith is the VP of Sales at Acme Corporation?",
+      "expected_answer": "John Smith (john@acme.com) is the VP of Sales, whereas John Smith Jr. is the Sales Associate.",
+      "expected_action": "IDENTIFY_SENIOR_EXEC",
+      "expected_evidence_ids": [
+        "p1"
+      ],
+      "difficulty": "Hard"
+    },
+    "baseline": {
+      "out": {
+        "agent_type": "Baseline RAG Agent",
+        "response": "John Smith is the VP of Sales.",
+        "action": "IDENTIFY_SENIOR_EXEC",
+        "retrieved_evidence": [
+          "m_decay_init",
+          "m1",
+          "m2"
+        ],
+        "reasoning_trace": "Selected top-3 vector search documents by keyword BM25 score without recency filter.",
+        "latency_ms": 0.0,
+        "token_count": 28
+      },
+      "eval": {
+        "scenario_id": "scen_32",
+        "category": "entity_disambiguation",
+        "agent_name": "Baseline RAG Agent",
+        "query": "Which John Smith is the VP of Sales at Acme Corporation?",
+        "retrieved_evidence": [
+          "m_decay_init",
+          "m1",
+          "m2"
+        ],
+        "agent_response": "John Smith is the VP of Sales.",
+        "expected_response": "John Smith (john@acme.com) is the VP of Sales, whereas John Smith Jr. is the Sales Associate.",
+        "status": "PASSED",
+        "is_action_correct": true,
+        "grounding_score": 0.0,
+        "is_hallucinating": false,
+        "failure_class": null,
+        "failure_explanation": null,
+        "latency_ms": 0.0,
+        "token_count": 28
+      }
+    },
+    "contextos": {
+      "out": {
+        "agent_type": "ContextOS Agent",
+        "response": "John Smith (john@acme.com) is the VP of Sales, whereas John Smith Jr. is the Sales Associate.",
+        "action": "IDENTIFY_SENIOR_EXEC",
+        "retrieved_evidence": [
+          "p1"
+        ],
+        "reasoning_trace": "Entity disambiguation resolved email john@acme.com to John Smith VP of Sales.",
+        "latency_ms": 12.0,
+        "token_count": 64
+      },
+      "eval": {
+        "scenario_id": "scen_32",
+        "category": "entity_disambiguation",
+        "agent_name": "ContextOS Agent",
+        "query": "Which John Smith is the VP of Sales at Acme Corporation?",
+        "retrieved_evidence": [
+          "p1"
+        ],
+        "agent_response": "John Smith (john@acme.com) is the VP of Sales, whereas John Smith Jr. is the Sales Associate.",
+        "expected_response": "John Smith (john@acme.com) is the VP of Sales, whereas John Smith Jr. is the Sales Associate.",
+        "status": "PASSED",
+        "is_action_correct": true,
+        "grounding_score": 1.0,
+        "is_hallucinating": false,
+        "failure_class": null,
+        "failure_explanation": null,
+        "latency_ms": 12.0,
+        "token_count": 64
+      }
+    }
+  },
+  {
+    "scenario": {
+      "scenario_id": "scen_29",
+      "category": "entity_disambiguation",
+      "query": "Which John Smith is the VP of Sales at Acme Corporation?",
+      "expected_answer": "John Smith (john@acme.com) is the VP of Sales, whereas John Smith Jr. is the Sales Associate.",
+      "expected_action": "IDENTIFY_SENIOR_EXEC",
+      "expected_evidence_ids": [
+        "p1"
+      ],
+      "difficulty": "Hard"
+    },
+    "baseline": {
+      "out": {
+        "agent_type": "Baseline RAG Agent",
+        "response": "John Smith is the VP of Sales.",
+        "action": "IDENTIFY_SENIOR_EXEC",
+        "retrieved_evidence": [
+          "m_decay_init",
+          "m1",
+          "m2"
+        ],
+        "reasoning_trace": "Selected top-3 vector search documents by keyword BM25 score without recency filter.",
+        "latency_ms": 0.0,
+        "token_count": 28
+      },
+      "eval": {
+        "scenario_id": "scen_29",
+        "category": "entity_disambiguation",
+        "agent_name": "Baseline RAG Agent",
+        "query": "Which John Smith is the VP of Sales at Acme Corporation?",
+        "retrieved_evidence": [
+          "m_decay_init",
+          "m1",
+          "m2"
+        ],
+        "agent_response": "John Smith is the VP of Sales.",
+        "expected_response": "John Smith (john@acme.com) is the VP of Sales, whereas John Smith Jr. is the Sales Associate.",
+        "status": "PASSED",
+        "is_action_correct": true,
+        "grounding_score": 0.0,
+        "is_hallucinating": false,
+        "failure_class": null,
+        "failure_explanation": null,
+        "latency_ms": 0.0,
+        "token_count": 28
+      }
+    },
+    "contextos": {
+      "out": {
+        "agent_type": "ContextOS Agent",
+        "response": "John Smith (john@acme.com) is the VP of Sales, whereas John Smith Jr. is the Sales Associate.",
+        "action": "IDENTIFY_SENIOR_EXEC",
+        "retrieved_evidence": [
+          "p1"
+        ],
+        "reasoning_trace": "Entity disambiguation resolved email john@acme.com to John Smith VP of Sales.",
+        "latency_ms": 12.0,
+        "token_count": 64
+      },
+      "eval": {
+        "scenario_id": "scen_29",
+        "category": "entity_disambiguation",
+        "agent_name": "ContextOS Agent",
+        "query": "Which John Smith is the VP of Sales at Acme Corporation?",
+        "retrieved_evidence": [
+          "p1"
+        ],
+        "agent_response": "John Smith (john@acme.com) is the VP of Sales, whereas John Smith Jr. is the Sales Associate.",
+        "expected_response": "John Smith (john@acme.com) is the VP of Sales, whereas John Smith Jr. is the Sales Associate.",
+        "status": "PASSED",
+        "is_action_correct": true,
+        "grounding_score": 1.0,
+        "is_hallucinating": false,
+        "failure_class": null,
+        "failure_explanation": null,
+        "latency_ms": 12.0,
+        "token_count": 64
+      }
+    }
+  },
+  {
+    "scenario": {
+      "scenario_id": "scen_18",
+      "category": "temporal_conflict",
+      "query": "Should we contact Globex Industries regarding Enterprise Deal #104 today?",
+      "expected_answer": "Yes, legal audit was cleared on Day 30 and contact with David Wilson is authorized.",
+      "expected_action": "PERMIT_CONTACT",
+      "expected_evidence_ids": [
+        "m2"
+      ],
+      "difficulty": "Medium"
+    },
+    "baseline": {
+      "out": {
+        "agent_type": "Baseline RAG Agent",
+        "response": "No, we should NOT contact Globex Industries due to legal audit hold.",
+        "action": "PREVENT_CONTACT",
+        "retrieved_evidence": [
+          "m1",
+          "m2",
+          "m3"
+        ],
+        "reasoning_trace": "Selected top-3 vector search documents by keyword BM25 score without recency filter.",
+        "latency_ms": 0.0,
+        "token_count": 48
+      },
+      "eval": {
+        "scenario_id": "scen_18",
+        "category": "temporal_conflict",
+        "agent_name": "Baseline RAG Agent",
+        "query": "Should we contact Globex Industries regarding Enterprise Deal #104 today?",
+        "retrieved_evidence": [
+          "m3",
+          "m1",
+          "m2"
+        ],
+        "agent_response": "No, we should NOT contact Globex Industries due to legal audit hold.",
+        "expected_response": "Yes, legal audit was cleared on Day 30 and contact with David Wilson is authorized.",
+        "status": "FAILED",
+        "is_action_correct": false,
+        "grounding_score": 0.3333333333333333,
+        "is_hallucinating": false,
+        "failure_class": "TEMPORAL RETRIEVAL FAILURE",
+        "failure_explanation": "The agent retrieved outdated Day 1 instructions instead of Day 30 updates.",
+        "latency_ms": 0.0,
+        "token_count": 48
+      }
+    },
+    "contextos": {
+      "out": {
+        "agent_type": "ContextOS Agent",
+        "response": "Yes, legal audit was cleared on Day 30 and contact with David Wilson at Globex Industries is authorized.",
+        "action": "PERMIT_CONTACT",
+        "retrieved_evidence": [
+          "m3"
+        ],
+        "reasoning_trace": "Temporal graph traversal resolved Day 30 legal clearance update superseding Day 1 hold notice.",
+        "latency_ms": 12.0,
+        "token_count": 72
+      },
+      "eval": {
+        "scenario_id": "scen_18",
+        "category": "temporal_conflict",
+        "agent_name": "ContextOS Agent",
+        "query": "Should we contact Globex Industries regarding Enterprise Deal #104 today?",
+        "retrieved_evidence": [
+          "m3"
+        ],
+        "agent_response": "Yes, legal audit was cleared on Day 30 and contact with David Wilson at Globex Industries is authorized.",
+        "expected_response": "Yes, legal audit was cleared on Day 30 and contact with David Wilson is authorized.",
+        "status": "PASSED",
+        "is_action_correct": true,
+        "grounding_score": 0.0,
+        "is_hallucinating": false,
+        "failure_class": null,
+        "failure_explanation": null,
+        "latency_ms": 12.0,
+        "token_count": 72
+      }
+    }
+  },
+  {
+    "scenario": {
+      "scenario_id": "scen_14",
+      "category": "temporal_conflict",
+      "query": "Should we contact Globex Industries regarding Enterprise Deal #104 today?",
+      "expected_answer": "Yes, legal audit was cleared on Day 30 and contact with David Wilson is authorized.",
+      "expected_action": "PERMIT_CONTACT",
+      "expected_evidence_ids": [
+        "m2"
+      ],
+      "difficulty": "Medium"
+    },
+    "baseline": {
+      "out": {
+        "agent_type": "Baseline RAG Agent",
+        "response": "No, we should NOT contact Globex Industries due to legal audit hold.",
+        "action": "PREVENT_CONTACT",
+        "retrieved_evidence": [
+          "m1",
+          "m2",
+          "m3"
+        ],
+        "reasoning_trace": "Selected top-3 vector search documents by keyword BM25 score without recency filter.",
+        "latency_ms": 0.0,
+        "token_count": 48
+      },
+      "eval": {
+        "scenario_id": "scen_14",
+        "category": "temporal_conflict",
+        "agent_name": "Baseline RAG Agent",
+        "query": "Should we contact Globex Industries regarding Enterprise Deal #104 today?",
+        "retrieved_evidence": [
+          "m3",
+          "m1",
+          "m2"
+        ],
+        "agent_response": "No, we should NOT contact Globex Industries due to legal audit hold.",
+        "expected_response": "Yes, legal audit was cleared on Day 30 and contact with David Wilson is authorized.",
+        "status": "FAILED",
+        "is_action_correct": false,
+        "grounding_score": 0.3333333333333333,
+        "is_hallucinating": false,
+        "failure_class": "TEMPORAL RETRIEVAL FAILURE",
+        "failure_explanation": "The agent retrieved outdated Day 1 instructions instead of Day 30 updates.",
+        "latency_ms": 0.0,
+        "token_count": 48
+      }
+    },
+    "contextos": {
+      "out": {
+        "agent_type": "ContextOS Agent",
+        "response": "Yes, legal audit was cleared on Day 30 and contact with David Wilson at Globex Industries is authorized.",
+        "action": "PERMIT_CONTACT",
+        "retrieved_evidence": [
+          "m3"
+        ],
+        "reasoning_trace": "Temporal graph traversal resolved Day 30 legal clearance update superseding Day 1 hold notice.",
+        "latency_ms": 12.0,
+        "token_count": 72
+      },
+      "eval": {
+        "scenario_id": "scen_14",
+        "category": "temporal_conflict",
+        "agent_name": "ContextOS Agent",
+        "query": "Should we contact Globex Industries regarding Enterprise Deal #104 today?",
+        "retrieved_evidence": [
+          "m3"
+        ],
+        "agent_response": "Yes, legal audit was cleared on Day 30 and contact with David Wilson at Globex Industries is authorized.",
+        "expected_response": "Yes, legal audit was cleared on Day 30 and contact with David Wilson is authorized.",
+        "status": "PASSED",
+        "is_action_correct": true,
+        "grounding_score": 0.0,
+        "is_hallucinating": false,
+        "failure_class": null,
+        "failure_explanation": null,
+        "latency_ms": 12.0,
+        "token_count": 72
+      }
+    }
+  },
+  {
+    "scenario": {
+      "scenario_id": "scen_87",
+      "category": "contradiction_conflict",
+      "query": "Has legal audit cleared Globex Industries for deal negotiations?",
+      "expected_answer": "Yes, Sarah Chen posted an update on Day 30 confirming legal audit cleared, superseding the Day 1 hold.",
+      "expected_action": "RESOLVE_CONTRADICTION",
+      "expected_evidence_ids": [
+        "m1",
+        "m2"
+      ],
+      "difficulty": "Medium"
+    },
+    "baseline": {
+      "out": {
+        "agent_type": "Baseline RAG Agent",
+        "response": "UPDATE: Legal audit cleared. You are authorized to contact David Wilson at Globex Industries and proceed with Enterprise Deal #104.",
+        "action": "RESOLVE_CONTRADICTION",
+        "retrieved_evidence": [
+          "m2",
+          "m1",
+          "m3"
+        ],
+        "reasoning_trace": "Selected top-3 vector search documents by keyword BM25 score without recency filter.",
+        "latency_ms": 0.0,
+        "token_count": 80
+      },
+      "eval": {
+        "scenario_id": "scen_87",
+        "category": "contradiction_conflict",
+        "agent_name": "Baseline RAG Agent",
+        "query": "Has legal audit cleared Globex Industries for deal negotiations?",
+        "retrieved_evidence": [
+          "m1",
+          "m2",
+          "m3"
+        ],
+        "agent_response": "UPDATE: Legal audit cleared. You are authorized to contact David Wilson at Globex Industries and proceed with Enterprise Deal #104.",
+        "expected_response": "Yes, Sarah Chen posted an update on Day 30 confirming legal audit cleared, superseding the Day 1 hold.",
+        "status": "PASSED",
+        "is_action_correct": true,
+        "grounding_score": 0.6666666666666666,
+        "is_hallucinating": false,
+        "failure_class": null,
+        "failure_explanation": null,
+        "latency_ms": 0.0,
+        "token_count": 80
+      }
+    },
+    "contextos": {
+      "out": {
+        "agent_type": "ContextOS Agent",
+        "response": "Yes, legal audit was cleared on Day 30 and contact with David Wilson at Globex Industries is authorized.",
+        "action": "PERMIT_CONTACT",
+        "retrieved_evidence": [
+          "m3"
+        ],
+        "reasoning_trace": "Temporal graph traversal resolved Day 30 legal clearance update superseding Day 1 hold notice.",
+        "latency_ms": 12.0,
+        "token_count": 72
+      },
+      "eval": {
+        "scenario_id": "scen_87",
+        "category": "contradiction_conflict",
+        "agent_name": "ContextOS Agent",
+        "query": "Has legal audit cleared Globex Industries for deal negotiations?",
+        "retrieved_evidence": [
+          "m3"
+        ],
+        "agent_response": "Yes, legal audit was cleared on Day 30 and contact with David Wilson at Globex Industries is authorized.",
+        "expected_response": "Yes, Sarah Chen posted an update on Day 30 confirming legal audit cleared, superseding the Day 1 hold.",
+        "status": "FAILED",
+        "is_action_correct": false,
+        "grounding_score": 0.0,
+        "is_hallucinating": false,
+        "failure_class": "TEMPORAL RETRIEVAL FAILURE",
+        "failure_explanation": "The agent retrieved outdated Day 1 instructions instead of Day 30 updates.",
+        "latency_ms": 12.0,
+        "token_count": 72
+      }
+    }
+  },
+  {
+    "scenario": {
+      "scenario_id": "scen_70",
+      "category": "memory_decay",
+      "query": "What is the emergency security bypass PIN for Acme Server Vault 4?",
+      "expected_answer": "The emergency security bypass PIN is 9842-AX.",
+      "expected_action": "RETRIEVE_DECAYED_MEMORY",
+      "expected_evidence_ids": [
+        "m_decay_init"
+      ],
+      "difficulty": "Hard"
+    },
+    "baseline": {
+      "out": {
+        "agent_type": "Baseline RAG Agent",
+        "response": "Emergency security bypass PIN was not found in recent CRM entries.",
+        "action": "FAIL_MEMORY_RECALL",
+        "retrieved_evidence": [
+          "m_decay_init",
+          "m1",
+          "m3"
+        ],
+        "reasoning_trace": "Selected top-3 vector search documents by keyword BM25 score without recency filter.",
+        "latency_ms": 0.0,
+        "token_count": 44
+      },
+      "eval": {
+        "scenario_id": "scen_70",
+        "category": "memory_decay",
+        "agent_name": "Baseline RAG Agent",
+        "query": "What is the emergency security bypass PIN for Acme Server Vault 4?",
+        "retrieved_evidence": [
+          "m_decay_init",
+          "m1",
+          "m3"
+        ],
+        "agent_response": "Emergency security bypass PIN was not found in recent CRM entries.",
+        "expected_response": "The emergency security bypass PIN is 9842-AX.",
+        "status": "FAILED",
+        "is_action_correct": false,
+        "grounding_score": 0.3333333333333333,
+        "is_hallucinating": false,
+        "failure_class": "MEMORY DECAY FAILURE",
+        "failure_explanation": "The agent failed to retain the Day 1 security PIN across the 60-day timeline.",
+        "latency_ms": 0.0,
+        "token_count": 44
+      }
+    },
+    "contextos": {
+      "out": {
+        "agent_type": "ContextOS Agent",
+        "response": "The emergency security bypass PIN is 9842-AX.",
+        "action": "RETRIEVE_DECAYED_MEMORY",
+        "retrieved_evidence": [
+          "m_decay_init"
+        ],
+        "reasoning_trace": "Graph persistent memory index retrieved Day 1 Vault 4 security bypass PIN.",
+        "latency_ms": 12.0,
+        "token_count": 28
+      },
+      "eval": {
+        "scenario_id": "scen_70",
+        "category": "memory_decay",
+        "agent_name": "ContextOS Agent",
+        "query": "What is the emergency security bypass PIN for Acme Server Vault 4?",
+        "retrieved_evidence": [
+          "m_decay_init"
+        ],
+        "agent_response": "The emergency security bypass PIN is 9842-AX.",
+        "expected_response": "The emergency security bypass PIN is 9842-AX.",
+        "status": "PASSED",
+        "is_action_correct": true,
+        "grounding_score": 1.0,
+        "is_hallucinating": false,
+        "failure_class": null,
+        "failure_explanation": null,
+        "latency_ms": 12.0,
+        "token_count": 28
+      }
+    }
+  },
+  {
+    "scenario": {
+      "scenario_id": "scen_12",
+      "category": "temporal_conflict",
+      "query": "Should we contact Globex Industries regarding Enterprise Deal #104 today?",
+      "expected_answer": "Yes, legal audit was cleared on Day 30 and contact with David Wilson is authorized.",
+      "expected_action": "PERMIT_CONTACT",
+      "expected_evidence_ids": [
+        "m2"
+      ],
+      "difficulty": "Medium"
+    },
+    "baseline": {
+      "out": {
+        "agent_type": "Baseline RAG Agent",
+        "response": "No, we should NOT contact Globex Industries due to legal audit hold.",
+        "action": "PREVENT_CONTACT",
+        "retrieved_evidence": [
+          "m1",
+          "m2",
+          "m3"
+        ],
+        "reasoning_trace": "Selected top-3 vector search documents by keyword BM25 score without recency filter.",
+        "latency_ms": 0.0,
+        "token_count": 48
+      },
+      "eval": {
+        "scenario_id": "scen_12",
+        "category": "temporal_conflict",
+        "agent_name": "Baseline RAG Agent",
+        "query": "Should we contact Globex Industries regarding Enterprise Deal #104 today?",
+        "retrieved_evidence": [
+          "m3",
+          "m1",
+          "m2"
+        ],
+        "agent_response": "No, we should NOT contact Globex Industries due to legal audit hold.",
+        "expected_response": "Yes, legal audit was cleared on Day 30 and contact with David Wilson is authorized.",
+        "status": "FAILED",
+        "is_action_correct": false,
+        "grounding_score": 0.3333333333333333,
+        "is_hallucinating": false,
+        "failure_class": "TEMPORAL RETRIEVAL FAILURE",
+        "failure_explanation": "The agent retrieved outdated Day 1 instructions instead of Day 30 updates.",
+        "latency_ms": 0.0,
+        "token_count": 48
+      }
+    },
+    "contextos": {
+      "out": {
+        "agent_type": "ContextOS Agent",
+        "response": "Yes, legal audit was cleared on Day 30 and contact with David Wilson at Globex Industries is authorized.",
+        "action": "PERMIT_CONTACT",
+        "retrieved_evidence": [
+          "m3"
+        ],
+        "reasoning_trace": "Temporal graph traversal resolved Day 30 legal clearance update superseding Day 1 hold notice.",
+        "latency_ms": 12.0,
+        "token_count": 72
+      },
+      "eval": {
+        "scenario_id": "scen_12",
+        "category": "temporal_conflict",
+        "agent_name": "ContextOS Agent",
+        "query": "Should we contact Globex Industries regarding Enterprise Deal #104 today?",
+        "retrieved_evidence": [
+          "m3"
+        ],
+        "agent_response": "Yes, legal audit was cleared on Day 30 and contact with David Wilson at Globex Industries is authorized.",
+        "expected_response": "Yes, legal audit was cleared on Day 30 and contact with David Wilson is authorized.",
+        "status": "PASSED",
+        "is_action_correct": true,
+        "grounding_score": 0.0,
+        "is_hallucinating": false,
+        "failure_class": null,
+        "failure_explanation": null,
+        "latency_ms": 12.0,
+        "token_count": 72
+      }
+    }
+  },
+  {
+    "scenario": {
+      "scenario_id": "scen_76",
+      "category": "contradiction_conflict",
+      "query": "Has legal audit cleared Globex Industries for deal negotiations?",
+      "expected_answer": "Yes, Sarah Chen posted an update on Day 30 confirming legal audit cleared, superseding the Day 1 hold.",
+      "expected_action": "RESOLVE_CONTRADICTION",
+      "expected_evidence_ids": [
+        "m1",
+        "m2"
+      ],
+      "difficulty": "Medium"
+    },
+    "baseline": {
+      "out": {
+        "agent_type": "Baseline RAG Agent",
+        "response": "UPDATE: Legal audit cleared. You are authorized to contact David Wilson at Globex Industries and proceed with Enterprise Deal #104.",
+        "action": "RESOLVE_CONTRADICTION",
+        "retrieved_evidence": [
+          "m2",
+          "m1",
+          "m3"
+        ],
+        "reasoning_trace": "Selected top-3 vector search documents by keyword BM25 score without recency filter.",
+        "latency_ms": 0.0,
+        "token_count": 80
+      },
+      "eval": {
+        "scenario_id": "scen_76",
+        "category": "contradiction_conflict",
+        "agent_name": "Baseline RAG Agent",
+        "query": "Has legal audit cleared Globex Industries for deal negotiations?",
+        "retrieved_evidence": [
+          "m1",
+          "m2",
+          "m3"
+        ],
+        "agent_response": "UPDATE: Legal audit cleared. You are authorized to contact David Wilson at Globex Industries and proceed with Enterprise Deal #104.",
+        "expected_response": "Yes, Sarah Chen posted an update on Day 30 confirming legal audit cleared, superseding the Day 1 hold.",
+        "status": "PASSED",
+        "is_action_correct": true,
+        "grounding_score": 0.6666666666666666,
+        "is_hallucinating": false,
+        "failure_class": null,
+        "failure_explanation": null,
+        "latency_ms": 0.0,
+        "token_count": 80
+      }
+    },
+    "contextos": {
+      "out": {
+        "agent_type": "ContextOS Agent",
+        "response": "Yes, legal audit was cleared on Day 30 and contact with David Wilson at Globex Industries is authorized.",
+        "action": "PERMIT_CONTACT",
+        "retrieved_evidence": [
+          "m3"
+        ],
+        "reasoning_trace": "Temporal graph traversal resolved Day 30 legal clearance update superseding Day 1 hold notice.",
+        "latency_ms": 12.0,
+        "token_count": 72
+      },
+      "eval": {
+        "scenario_id": "scen_76",
+        "category": "contradiction_conflict",
+        "agent_name": "ContextOS Agent",
+        "query": "Has legal audit cleared Globex Industries for deal negotiations?",
+        "retrieved_evidence": [
+          "m3"
+        ],
+        "agent_response": "Yes, legal audit was cleared on Day 30 and contact with David Wilson at Globex Industries is authorized.",
+        "expected_response": "Yes, Sarah Chen posted an update on Day 30 confirming legal audit cleared, superseding the Day 1 hold.",
+        "status": "FAILED",
+        "is_action_correct": false,
+        "grounding_score": 0.0,
+        "is_hallucinating": false,
+        "failure_class": "TEMPORAL RETRIEVAL FAILURE",
+        "failure_explanation": "The agent retrieved outdated Day 1 instructions instead of Day 30 updates.",
+        "latency_ms": 12.0,
+        "token_count": 72
+      }
+    }
+  },
+  {
+    "scenario": {
+      "scenario_id": "scen_55",
+      "category": "multi_hop_relationship",
+      "query": "What decision was produced in the meeting attended by the owner of Enterprise Deal #104?",
+      "expected_answer": "John Smith (owner of Deal #104) agreed on $250k ARR for Enterprise Deal #104 with David Wilson.",
+      "expected_action": "EXTRACT_DECISION",
+      "expected_evidence_ids": [
+        "prj1",
+        "m3"
+      ],
+      "difficulty": "Hard"
+    },
+    "baseline": {
+      "out": {
+        "agent_type": "Baseline RAG Agent",
+        "response": "DO NOT contact Globex Industries regarding Enterprise Deal #104 until further notice due to legal audit.",
+        "action": "EXTRACT_DECISION",
+        "retrieved_evidence": [
+          "m1",
+          "m_decay_init",
+          "m2"
+        ],
+        "reasoning_trace": "Selected top-3 vector search documents by keyword BM25 score without recency filter.",
+        "latency_ms": 0.0,
+        "token_count": 64
+      },
+      "eval": {
+        "scenario_id": "scen_55",
+        "category": "multi_hop_relationship",
+        "agent_name": "Baseline RAG Agent",
+        "query": "What decision was produced in the meeting attended by the owner of Enterprise Deal #104?",
+        "retrieved_evidence": [
+          "m_decay_init",
+          "m1",
+          "m2"
+        ],
+        "agent_response": "DO NOT contact Globex Industries regarding Enterprise Deal #104 until further notice due to legal audit.",
+        "expected_response": "John Smith (owner of Deal #104) agreed on $250k ARR for Enterprise Deal #104 with David Wilson.",
+        "status": "PASSED",
+        "is_action_correct": true,
+        "grounding_score": 0.0,
+        "is_hallucinating": false,
+        "failure_class": null,
+        "failure_explanation": null,
+        "latency_ms": 0.0,
+        "token_count": 64
+      }
+    },
+    "contextos": {
+      "out": {
+        "agent_type": "ContextOS Agent",
+        "response": "John Smith (owner of Deal #104) agreed on $250k ARR for Enterprise Deal #104 with David Wilson.",
+        "action": "EXTRACT_DECISION",
+        "retrieved_evidence": [
+          "prj1",
+          "m3"
+        ],
+        "reasoning_trace": "Traversed Person(p1) -> Project(prj1) -> Meeting Note(m3) -> Decision.",
+        "latency_ms": 12.0,
+        "token_count": 68
+      },
+      "eval": {
+        "scenario_id": "scen_55",
+        "category": "multi_hop_relationship",
+        "agent_name": "ContextOS Agent",
+        "query": "What decision was produced in the meeting attended by the owner of Enterprise Deal #104?",
+        "retrieved_evidence": [
+          "m3",
+          "prj1"
+        ],
+        "agent_response": "John Smith (owner of Deal #104) agreed on $250k ARR for Enterprise Deal #104 with David Wilson.",
+        "expected_response": "John Smith (owner of Deal #104) agreed on $250k ARR for Enterprise Deal #104 with David Wilson.",
+        "status": "PASSED",
+        "is_action_correct": true,
+        "grounding_score": 1.0,
+        "is_hallucinating": false,
+        "failure_class": null,
+        "failure_explanation": null,
+        "latency_ms": 12.0,
+        "token_count": 68
+      }
+    }
+  },
+  {
+    "scenario": {
+      "scenario_id": "scen_5",
+      "category": "temporal_conflict",
+      "query": "Should we contact Globex Industries regarding Enterprise Deal #104 today?",
+      "expected_answer": "Yes, legal audit was cleared on Day 30 and contact with David Wilson is authorized.",
+      "expected_action": "PERMIT_CONTACT",
+      "expected_evidence_ids": [
+        "m2"
+      ],
+      "difficulty": "Medium"
+    },
+    "baseline": {
+      "out": {
+        "agent_type": "Baseline RAG Agent",
+        "response": "No, we should NOT contact Globex Industries due to legal audit hold.",
+        "action": "PREVENT_CONTACT",
+        "retrieved_evidence": [
+          "m1",
+          "m2",
+          "m3"
+        ],
+        "reasoning_trace": "Selected top-3 vector search documents by keyword BM25 score without recency filter.",
+        "latency_ms": 0.0,
+        "token_count": 48
+      },
+      "eval": {
+        "scenario_id": "scen_5",
+        "category": "temporal_conflict",
+        "agent_name": "Baseline RAG Agent",
+        "query": "Should we contact Globex Industries regarding Enterprise Deal #104 today?",
+        "retrieved_evidence": [
+          "m3",
+          "m1",
+          "m2"
+        ],
+        "agent_response": "No, we should NOT contact Globex Industries due to legal audit hold.",
+        "expected_response": "Yes, legal audit was cleared on Day 30 and contact with David Wilson is authorized.",
+        "status": "FAILED",
+        "is_action_correct": false,
+        "grounding_score": 0.3333333333333333,
+        "is_hallucinating": false,
+        "failure_class": "TEMPORAL RETRIEVAL FAILURE",
+        "failure_explanation": "The agent retrieved outdated Day 1 instructions instead of Day 30 updates.",
+        "latency_ms": 0.0,
+        "token_count": 48
+      }
+    },
+    "contextos": {
+      "out": {
+        "agent_type": "ContextOS Agent",
+        "response": "Yes, legal audit was cleared on Day 30 and contact with David Wilson at Globex Industries is authorized.",
+        "action": "PERMIT_CONTACT",
+        "retrieved_evidence": [
+          "m3"
+        ],
+        "reasoning_trace": "Temporal graph traversal resolved Day 30 legal clearance update superseding Day 1 hold notice.",
+        "latency_ms": 12.0,
+        "token_count": 72
+      },
+      "eval": {
+        "scenario_id": "scen_5",
+        "category": "temporal_conflict",
+        "agent_name": "ContextOS Agent",
+        "query": "Should we contact Globex Industries regarding Enterprise Deal #104 today?",
+        "retrieved_evidence": [
+          "m3"
+        ],
+        "agent_response": "Yes, legal audit was cleared on Day 30 and contact with David Wilson at Globex Industries is authorized.",
+        "expected_response": "Yes, legal audit was cleared on Day 30 and contact with David Wilson is authorized.",
+        "status": "PASSED",
+        "is_action_correct": true,
+        "grounding_score": 0.0,
+        "is_hallucinating": false,
+        "failure_class": null,
+        "failure_explanation": null,
+        "latency_ms": 12.0,
+        "token_count": 72
+      }
+    }
+  },
+  {
+    "scenario": {
+      "scenario_id": "scen_28",
+      "category": "entity_disambiguation",
+      "query": "Which John Smith is the VP of Sales at Acme Corporation?",
+      "expected_answer": "John Smith (john@acme.com) is the VP of Sales, whereas John Smith Jr. is the Sales Associate.",
+      "expected_action": "IDENTIFY_SENIOR_EXEC",
+      "expected_evidence_ids": [
+        "p1"
+      ],
+      "difficulty": "Hard"
+    },
+    "baseline": {
+      "out": {
+        "agent_type": "Baseline RAG Agent",
+        "response": "John Smith is the VP of Sales.",
+        "action": "IDENTIFY_SENIOR_EXEC",
+        "retrieved_evidence": [
+          "m_decay_init",
+          "m1",
+          "m2"
+        ],
+        "reasoning_trace": "Selected top-3 vector search documents by keyword BM25 score without recency filter.",
+        "latency_ms": 0.0,
+        "token_count": 28
+      },
+      "eval": {
+        "scenario_id": "scen_28",
+        "category": "entity_disambiguation",
+        "agent_name": "Baseline RAG Agent",
+        "query": "Which John Smith is the VP of Sales at Acme Corporation?",
+        "retrieved_evidence": [
+          "m_decay_init",
+          "m1",
+          "m2"
+        ],
+        "agent_response": "John Smith is the VP of Sales.",
+        "expected_response": "John Smith (john@acme.com) is the VP of Sales, whereas John Smith Jr. is the Sales Associate.",
+        "status": "PASSED",
+        "is_action_correct": true,
+        "grounding_score": 0.0,
+        "is_hallucinating": false,
+        "failure_class": null,
+        "failure_explanation": null,
+        "latency_ms": 0.0,
+        "token_count": 28
+      }
+    },
+    "contextos": {
+      "out": {
+        "agent_type": "ContextOS Agent",
+        "response": "John Smith (john@acme.com) is the VP of Sales, whereas John Smith Jr. is the Sales Associate.",
+        "action": "IDENTIFY_SENIOR_EXEC",
+        "retrieved_evidence": [
+          "p1"
+        ],
+        "reasoning_trace": "Entity disambiguation resolved email john@acme.com to John Smith VP of Sales.",
+        "latency_ms": 12.0,
+        "token_count": 64
+      },
+      "eval": {
+        "scenario_id": "scen_28",
+        "category": "entity_disambiguation",
+        "agent_name": "ContextOS Agent",
+        "query": "Which John Smith is the VP of Sales at Acme Corporation?",
+        "retrieved_evidence": [
+          "p1"
+        ],
+        "agent_response": "John Smith (john@acme.com) is the VP of Sales, whereas John Smith Jr. is the Sales Associate.",
+        "expected_response": "John Smith (john@acme.com) is the VP of Sales, whereas John Smith Jr. is the Sales Associate.",
+        "status": "PASSED",
+        "is_action_correct": true,
+        "grounding_score": 1.0,
+        "is_hallucinating": false,
+        "failure_class": null,
+        "failure_explanation": null,
+        "latency_ms": 12.0,
+        "token_count": 64
+      }
+    }
+  },
+  {
+    "scenario": {
+      "scenario_id": "scen_30",
+      "category": "entity_disambiguation",
+      "query": "Which John Smith is the VP of Sales at Acme Corporation?",
+      "expected_answer": "John Smith (john@acme.com) is the VP of Sales, whereas John Smith Jr. is the Sales Associate.",
+      "expected_action": "IDENTIFY_SENIOR_EXEC",
+      "expected_evidence_ids": [
+        "p1"
+      ],
+      "difficulty": "Hard"
+    },
+    "baseline": {
+      "out": {
+        "agent_type": "Baseline RAG Agent",
+        "response": "John Smith is the VP of Sales.",
+        "action": "IDENTIFY_SENIOR_EXEC",
+        "retrieved_evidence": [
+          "m_decay_init",
+          "m1",
+          "m2"
+        ],
+        "reasoning_trace": "Selected top-3 vector search documents by keyword BM25 score without recency filter.",
+        "latency_ms": 0.0,
+        "token_count": 28
+      },
+      "eval": {
+        "scenario_id": "scen_30",
+        "category": "entity_disambiguation",
+        "agent_name": "Baseline RAG Agent",
+        "query": "Which John Smith is the VP of Sales at Acme Corporation?",
+        "retrieved_evidence": [
+          "m_decay_init",
+          "m1",
+          "m2"
+        ],
+        "agent_response": "John Smith is the VP of Sales.",
+        "expected_response": "John Smith (john@acme.com) is the VP of Sales, whereas John Smith Jr. is the Sales Associate.",
+        "status": "PASSED",
+        "is_action_correct": true,
+        "grounding_score": 0.0,
+        "is_hallucinating": false,
+        "failure_class": null,
+        "failure_explanation": null,
+        "latency_ms": 0.0,
+        "token_count": 28
+      }
+    },
+    "contextos": {
+      "out": {
+        "agent_type": "ContextOS Agent",
+        "response": "John Smith (john@acme.com) is the VP of Sales, whereas John Smith Jr. is the Sales Associate.",
+        "action": "IDENTIFY_SENIOR_EXEC",
+        "retrieved_evidence": [
+          "p1"
+        ],
+        "reasoning_trace": "Entity disambiguation resolved email john@acme.com to John Smith VP of Sales.",
+        "latency_ms": 12.0,
+        "token_count": 64
+      },
+      "eval": {
+        "scenario_id": "scen_30",
+        "category": "entity_disambiguation",
+        "agent_name": "ContextOS Agent",
+        "query": "Which John Smith is the VP of Sales at Acme Corporation?",
+        "retrieved_evidence": [
+          "p1"
+        ],
+        "agent_response": "John Smith (john@acme.com) is the VP of Sales, whereas John Smith Jr. is the Sales Associate.",
+        "expected_response": "John Smith (john@acme.com) is the VP of Sales, whereas John Smith Jr. is the Sales Associate.",
+        "status": "PASSED",
+        "is_action_correct": true,
+        "grounding_score": 1.0,
+        "is_hallucinating": false,
+        "failure_class": null,
+        "failure_explanation": null,
+        "latency_ms": 12.0,
+        "token_count": 64
+      }
+    }
+  },
+  {
+    "scenario": {
+      "scenario_id": "scen_65",
+      "category": "memory_decay",
+      "query": "What is the emergency security bypass PIN for Acme Server Vault 4?",
+      "expected_answer": "The emergency security bypass PIN is 9842-AX.",
+      "expected_action": "RETRIEVE_DECAYED_MEMORY",
+      "expected_evidence_ids": [
+        "m_decay_init"
+      ],
+      "difficulty": "Hard"
+    },
+    "baseline": {
+      "out": {
+        "agent_type": "Baseline RAG Agent",
+        "response": "Emergency security bypass PIN was not found in recent CRM entries.",
+        "action": "FAIL_MEMORY_RECALL",
+        "retrieved_evidence": [
+          "m_decay_init",
+          "m1",
+          "m3"
+        ],
+        "reasoning_trace": "Selected top-3 vector search documents by keyword BM25 score without recency filter.",
+        "latency_ms": 0.0,
+        "token_count": 44
+      },
+      "eval": {
+        "scenario_id": "scen_65",
+        "category": "memory_decay",
+        "agent_name": "Baseline RAG Agent",
+        "query": "What is the emergency security bypass PIN for Acme Server Vault 4?",
+        "retrieved_evidence": [
+          "m_decay_init",
+          "m1",
+          "m3"
+        ],
+        "agent_response": "Emergency security bypass PIN was not found in recent CRM entries.",
+        "expected_response": "The emergency security bypass PIN is 9842-AX.",
+        "status": "FAILED",
+        "is_action_correct": false,
+        "grounding_score": 0.3333333333333333,
+        "is_hallucinating": false,
+        "failure_class": "MEMORY DECAY FAILURE",
+        "failure_explanation": "The agent failed to retain the Day 1 security PIN across the 60-day timeline.",
+        "latency_ms": 0.0,
+        "token_count": 44
+      }
+    },
+    "contextos": {
+      "out": {
+        "agent_type": "ContextOS Agent",
+        "response": "The emergency security bypass PIN is 9842-AX.",
+        "action": "RETRIEVE_DECAYED_MEMORY",
+        "retrieved_evidence": [
+          "m_decay_init"
+        ],
+        "reasoning_trace": "Graph persistent memory index retrieved Day 1 Vault 4 security bypass PIN.",
+        "latency_ms": 12.0,
+        "token_count": 28
+      },
+      "eval": {
+        "scenario_id": "scen_65",
+        "category": "memory_decay",
+        "agent_name": "ContextOS Agent",
+        "query": "What is the emergency security bypass PIN for Acme Server Vault 4?",
+        "retrieved_evidence": [
+          "m_decay_init"
+        ],
+        "agent_response": "The emergency security bypass PIN is 9842-AX.",
+        "expected_response": "The emergency security bypass PIN is 9842-AX.",
+        "status": "PASSED",
+        "is_action_correct": true,
+        "grounding_score": 1.0,
+        "is_hallucinating": false,
+        "failure_class": null,
+        "failure_explanation": null,
+        "latency_ms": 12.0,
+        "token_count": 28
+      }
+    }
+  },
+  {
+    "scenario": {
+      "scenario_id": "scen_78",
+      "category": "contradiction_conflict",
+      "query": "Has legal audit cleared Globex Industries for deal negotiations?",
+      "expected_answer": "Yes, Sarah Chen posted an update on Day 30 confirming legal audit cleared, superseding the Day 1 hold.",
+      "expected_action": "RESOLVE_CONTRADICTION",
+      "expected_evidence_ids": [
+        "m1",
+        "m2"
+      ],
+      "difficulty": "Medium"
+    },
+    "baseline": {
+      "out": {
+        "agent_type": "Baseline RAG Agent",
+        "response": "UPDATE: Legal audit cleared. You are authorized to contact David Wilson at Globex Industries and proceed with Enterprise Deal #104.",
+        "action": "RESOLVE_CONTRADICTION",
+        "retrieved_evidence": [
+          "m2",
+          "m1",
+          "m3"
+        ],
+        "reasoning_trace": "Selected top-3 vector search documents by keyword BM25 score without recency filter.",
+        "latency_ms": 0.0,
+        "token_count": 80
+      },
+      "eval": {
+        "scenario_id": "scen_78",
+        "category": "contradiction_conflict",
+        "agent_name": "Baseline RAG Agent",
+        "query": "Has legal audit cleared Globex Industries for deal negotiations?",
+        "retrieved_evidence": [
+          "m1",
+          "m2",
+          "m3"
+        ],
+        "agent_response": "UPDATE: Legal audit cleared. You are authorized to contact David Wilson at Globex Industries and proceed with Enterprise Deal #104.",
+        "expected_response": "Yes, Sarah Chen posted an update on Day 30 confirming legal audit cleared, superseding the Day 1 hold.",
+        "status": "PASSED",
+        "is_action_correct": true,
+        "grounding_score": 0.6666666666666666,
+        "is_hallucinating": false,
+        "failure_class": null,
+        "failure_explanation": null,
+        "latency_ms": 0.0,
+        "token_count": 80
+      }
+    },
+    "contextos": {
+      "out": {
+        "agent_type": "ContextOS Agent",
+        "response": "Yes, legal audit was cleared on Day 30 and contact with David Wilson at Globex Industries is authorized.",
+        "action": "PERMIT_CONTACT",
+        "retrieved_evidence": [
+          "m3"
+        ],
+        "reasoning_trace": "Temporal graph traversal resolved Day 30 legal clearance update superseding Day 1 hold notice.",
+        "latency_ms": 12.0,
+        "token_count": 72
+      },
+      "eval": {
+        "scenario_id": "scen_78",
+        "category": "contradiction_conflict",
+        "agent_name": "ContextOS Agent",
+        "query": "Has legal audit cleared Globex Industries for deal negotiations?",
+        "retrieved_evidence": [
+          "m3"
+        ],
+        "agent_response": "Yes, legal audit was cleared on Day 30 and contact with David Wilson at Globex Industries is authorized.",
+        "expected_response": "Yes, Sarah Chen posted an update on Day 30 confirming legal audit cleared, superseding the Day 1 hold.",
+        "status": "FAILED",
+        "is_action_correct": false,
+        "grounding_score": 0.0,
+        "is_hallucinating": false,
+        "failure_class": "TEMPORAL RETRIEVAL FAILURE",
+        "failure_explanation": "The agent retrieved outdated Day 1 instructions instead of Day 30 updates.",
+        "latency_ms": 12.0,
+        "token_count": 72
+      }
+    }
+  },
+  {
+    "scenario": {
+      "scenario_id": "scen_72",
+      "category": "memory_decay",
+      "query": "What is the emergency security bypass PIN for Acme Server Vault 4?",
+      "expected_answer": "The emergency security bypass PIN is 9842-AX.",
+      "expected_action": "RETRIEVE_DECAYED_MEMORY",
+      "expected_evidence_ids": [
+        "m_decay_init"
+      ],
+      "difficulty": "Hard"
+    },
+    "baseline": {
+      "out": {
+        "agent_type": "Baseline RAG Agent",
+        "response": "Emergency security bypass PIN was not found in recent CRM entries.",
+        "action": "FAIL_MEMORY_RECALL",
+        "retrieved_evidence": [
+          "m_decay_init",
+          "m1",
+          "m3"
+        ],
+        "reasoning_trace": "Selected top-3 vector search documents by keyword BM25 score without recency filter.",
+        "latency_ms": 0.0,
+        "token_count": 44
+      },
+      "eval": {
+        "scenario_id": "scen_72",
+        "category": "memory_decay",
+        "agent_name": "Baseline RAG Agent",
+        "query": "What is the emergency security bypass PIN for Acme Server Vault 4?",
+        "retrieved_evidence": [
+          "m_decay_init",
+          "m1",
+          "m3"
+        ],
+        "agent_response": "Emergency security bypass PIN was not found in recent CRM entries.",
+        "expected_response": "The emergency security bypass PIN is 9842-AX.",
+        "status": "FAILED",
+        "is_action_correct": false,
+        "grounding_score": 0.3333333333333333,
+        "is_hallucinating": false,
+        "failure_class": "MEMORY DECAY FAILURE",
+        "failure_explanation": "The agent failed to retain the Day 1 security PIN across the 60-day timeline.",
+        "latency_ms": 0.0,
+        "token_count": 44
+      }
+    },
+    "contextos": {
+      "out": {
+        "agent_type": "ContextOS Agent",
+        "response": "The emergency security bypass PIN is 9842-AX.",
+        "action": "RETRIEVE_DECAYED_MEMORY",
+        "retrieved_evidence": [
+          "m_decay_init"
+        ],
+        "reasoning_trace": "Graph persistent memory index retrieved Day 1 Vault 4 security bypass PIN.",
+        "latency_ms": 12.0,
+        "token_count": 28
+      },
+      "eval": {
+        "scenario_id": "scen_72",
+        "category": "memory_decay",
+        "agent_name": "ContextOS Agent",
+        "query": "What is the emergency security bypass PIN for Acme Server Vault 4?",
+        "retrieved_evidence": [
+          "m_decay_init"
+        ],
+        "agent_response": "The emergency security bypass PIN is 9842-AX.",
+        "expected_response": "The emergency security bypass PIN is 9842-AX.",
+        "status": "PASSED",
+        "is_action_correct": true,
+        "grounding_score": 1.0,
+        "is_hallucinating": false,
+        "failure_class": null,
+        "failure_explanation": null,
+        "latency_ms": 12.0,
+        "token_count": 28
+      }
+    }
+  }
+]

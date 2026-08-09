@@ -1,63 +1,96 @@
 """
-ContextOS Phase 2 — Deterministic Evaluator Engine
-Computes multi-dimensional scores across:
-- Overall Accuracy (%)
-- Memory Retention (%)
-- Temporal Reasoning (%)
-- Entity Disambiguation (%)
-- Evidence Grounding (%)
-- Hallucination Rate (%)
-- P50 and P95 Latencies (ms)
+ContextOS Phase 2.1 — Deterministic Evaluator Engine
+Evaluates agent output against ground truth evidence and answer facts.
+Calculates multi-dimensional benchmark metrics without relying on agent-declared category fields.
 """
 
 import numpy as np
+import re
 from typing import Dict, List, Any
 
 class EvaluationEngine:
     def evaluate_single(self, scenario: Dict[str, Any], agent_output: Dict[str, Any]) -> Dict[str, Any]:
         category = scenario.get("category")
-        expected_action = scenario.get("expected_action")
-        actual_action = agent_output.get("action")
+        expected_answer = scenario.get("expected_answer", "").lower()
+        agent_response = agent_output.get("response", "").lower()
         expected_evidence = set(scenario.get("expected_evidence_ids", []))
         actual_evidence = set(agent_output.get("retrieved_evidence", []))
 
-        is_action_correct = (expected_action == actual_action)
-        
-        # Evidence Grounding score (Jaccard similarity of retrieved evidence)
+        # Grounding Score (Jaccard similarity of evidence IDs)
         if expected_evidence:
             intersection = len(expected_evidence.intersection(actual_evidence))
             union = len(expected_evidence.union(actual_evidence))
             grounding_score = intersection / union if union > 0 else 0.0
         else:
-            grounding_score = 1.0 if len(actual_evidence) == 0 else 0.5
+            grounding_score = 1.0 if len(actual_evidence) == 0 else 0.0
 
-        # Hallucination check
+        # Action / Answer Correctness Assertions
+        is_action_correct = False
         is_hallucinating = False
-        if category == "missing_information" and actual_action != "DECLINE_HALLUCINATION":
-            is_hallucinating = True
 
-        # Failure classification
+        if category == "missing_information":
+            if "not have enough information" in agent_response or "decline" in agent_response:
+                is_action_correct = True
+                is_hallucinating = False
+            else:
+                is_action_correct = False
+                is_hallucinating = True
+
+        elif category == "entity_disambiguation":
+            # Must explicitly distinguish john.smith@acme.com VP from john.jr@acme.com Associate
+            if "john.smith@acme.com" in agent_response and ("john.jr@acme.com" in agent_response or "associate" in agent_response):
+                is_action_correct = True
+            else:
+                is_action_correct = False
+
+        elif category == "temporal_conflict" or category == "contradiction_conflict":
+            if "authorized" in agent_response or "approved" in agent_response or "cleared" in agent_response:
+                is_action_correct = True
+            elif "do not contact" in agent_response or "hold" in agent_response or "rejected" in agent_response:
+                is_action_correct = False
+            else:
+                is_action_correct = False
+
+        elif category == "memory_decay":
+            # Check for security bypass code match
+            pin_match = re.search(r'\d{4}-[a-z]{2}', expected_answer)
+            if pin_match and pin_match.group(0) in agent_response:
+                is_action_correct = True
+            else:
+                is_action_correct = False
+
+        elif category == "multi_hop_relationship":
+            if "300k" in agent_response or "250k" in agent_response or "finalized" in agent_response:
+                is_action_correct = True
+            else:
+                is_action_correct = False
+
+        # Classify Failure Taxonomy
         failure_class = None
         failure_explanation = None
+
         if not is_action_correct:
             if category == "temporal_conflict" or category == "contradiction_conflict":
                 failure_class = "TEMPORAL RETRIEVAL FAILURE"
-                failure_explanation = "The agent retrieved outdated Day 1 instructions instead of Day 30 updates."
+                failure_explanation = "Agent relied on outdated Day 1 hold notice instead of Day 30 legal clearance update."
             elif category == "entity_disambiguation":
                 failure_class = "ENTITY RESOLUTION FAILURE"
-                failure_explanation = "The agent failed to disambiguate John Smith VP of Sales from John Smith Jr."
+                failure_explanation = "Agent failed to explicitly distinguish John Smith VP Sales from John Smith Jr. Sales Associate."
             elif category == "multi_hop_relationship":
                 failure_class = "CONTEXT COMPOSITION FAILURE"
-                failure_explanation = "Retrieved CRM and meeting records but failed to connect them into the correct decision."
+                failure_explanation = "Agent failed to traverse Person -> Project -> Meeting note to extract finalized terms."
             elif category == "memory_decay":
                 failure_class = "MEMORY DECAY FAILURE"
-                failure_explanation = "The agent failed to retain the Day 1 security PIN across the 60-day timeline."
+                failure_explanation = "Agent failed to retain early Day 1 vault security bypass code across the 60-day timeline."
             elif category == "missing_information":
                 failure_class = "HALLUCINATION FAILURE"
-                failure_explanation = "The agent hallucinated facts for an unannounced missing context query."
+                failure_explanation = "Agent hallucinated answer facts for unannounced missing context query."
             else:
                 failure_class = "RETRIEVAL RANKING FAILURE"
-                failure_explanation = "Top-K vector search failed to retrieve ground truth evidence."
+                failure_explanation = "Top-K vector/keyword search failed to retrieve ground truth evidence."
+
+        latency_dict = agent_output.get("latency", {})
+        total_ms = latency_dict.get("total_ms", 5.0)
 
         return {
             "scenario_id": scenario.get("scenario_id"),
@@ -73,8 +106,10 @@ class EvaluationEngine:
             "is_hallucinating": is_hallucinating,
             "failure_class": failure_class,
             "failure_explanation": failure_explanation,
-            "latency_ms": agent_output.get("latency_ms", 15.0),
-            "token_count": agent_output.get("token_count", 100)
+            "latency": latency_dict,
+            "latency_ms": total_ms,
+            "token_count": agent_output.get("token_count", 0),
+            "generation_mode": agent_output.get("generation_mode", "deterministic")
         }
 
     def aggregate_benchmark_results(self, run_id: str, agent_name: str, traces: List[Dict[str, Any]]) -> Dict[str, Any]:
@@ -119,6 +154,7 @@ class EvaluationEngine:
             "entity_disambiguation": round(entity_disambiguation, 1),
             "evidence_grounding": round(evidence_grounding, 1),
             "hallucination_rate": round(hallucination_rate, 1),
-            "p50_latency_ms": round(p50_latency, 1),
-            "p95_latency_ms": round(p95_latency, 1)
+            "p50_latency_ms": round(p50_latency, 2),
+            "p95_latency_ms": round(p95_latency, 2),
+            "generation_mode": traces[0].get("generation_mode", "deterministic")
         }
