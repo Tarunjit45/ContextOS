@@ -37,7 +37,7 @@ export default function RootLayout({
                 { href: '/architecture', label: 'ARCHITECTURE' },
                 { href: '/benchmarks', label: 'BENCHMARKS' },
                 { href: '/evaluations/1247', label: 'EVALUATION #1247', signature: true },
-                { href: '/failures', label: 'FAILURES' },
+                { href: '/failures', label: 'FAILURES EXPLORER' },
               ].map((item) => (
                 <Link
                   key={item.href}

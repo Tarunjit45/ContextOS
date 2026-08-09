@@ -26,7 +26,18 @@ export default function BenchmarksPage() {
     fetch('http://localhost:8000/api/benchmarks/history')
       .then((res) => res.json())
       .then((data) => {
-        setRuns(data.runs || []);
+        const rawRuns: BenchmarkRun[] = data.runs || [];
+        // Group & deduplicate runs by agent_name and run_id prefix to prevent clutter
+        const seenKeys = new Set<string>();
+        const filtered: BenchmarkRun[] = [];
+        for (const r of rawRuns) {
+          const key = `${r.agent_name}_${r.scenario_count}_${r.overall_accuracy}`;
+          if (!seenKeys.has(key)) {
+            seenKeys.add(key);
+            filtered.push(r);
+          }
+        }
+        setRuns(filtered);
         setLoading(false);
       })
       .catch(() => {
@@ -35,30 +46,30 @@ export default function BenchmarksPage() {
   }, []);
 
   return (
-    <div className="max-w-6xl mx-auto space-y-10 font-mono text-slate-100 p-2">
+    <div className="max-w-6xl mx-auto space-y-10 font-sans text-slate-100 p-2">
       {/* Header */}
-      <div className="border-b border-slate-800/80 pb-6 flex items-center justify-between">
+      <div className="border-b border-slate-800/80 pb-6 flex items-center justify-between font-mono">
         <div>
           <div className="flex items-center gap-3">
-            <h1 className="text-2xl font-bold text-white tracking-tight">Benchmark Laboratory</h1>
-            <span className="px-2.5 py-0.5 rounded bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 text-xs font-mono">
+            <h1 className="text-xl font-bold text-white tracking-tight">Benchmark Laboratory</h1>
+            <span className="px-2.5 py-0.5 rounded bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 text-xs">
               PHASE 3.3 VALIDATED
             </span>
           </div>
           <p className="text-sm text-slate-400 mt-1 font-sans">
-            Comparative evaluation suite across Baseline RAG, ContextOS Full, and ContextOS Compact.
+            Canonical benchmark suite comparing Baseline RAG, ContextOS Full, and ContextOS Compact.
           </p>
         </div>
         <Link
           href="/"
-          className="px-4 py-2 rounded bg-slate-900 border border-slate-800 text-xs font-bold text-slate-300 hover:border-slate-700 transition-colors"
+          className="px-4 py-2 rounded bg-slate-900 border border-slate-800 text-xs font-mono text-slate-300 hover:border-slate-700 transition-colors"
         >
           ← Overview
         </Link>
       </div>
 
       {/* Dataset v1 Freeze Guard Banner */}
-      <div className="rounded-xl border border-indigo-500/30 bg-indigo-500/5 p-4 flex items-center justify-between">
+      <div className="rounded-xl border border-indigo-500/30 bg-indigo-500/5 p-4 flex items-center justify-between font-mono">
         <div className="flex items-center gap-3">
           <span className="text-base">🔒</span>
           <div>
@@ -73,20 +84,20 @@ export default function BenchmarksPage() {
         </span>
       </div>
 
-      {/* PRIMARY BENCHMARK COMPARISON CENTERPIECE (Real LLM n=10) */}
+      {/* SECTION 1: REAL LLM EVALUATION BENCHMARK (n=10) */}
       <div className="p-6 rounded-xl bg-[#0d0f17] border border-slate-800/80 space-y-6">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-2">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-2 border-b border-slate-800 pb-4">
           <div>
-            <div className="text-xs font-bold text-indigo-400 uppercase tracking-wider">CANONICAL REAL LLM EVALUATION</div>
-            <h2 className="text-lg font-bold text-white mt-0.5">Three-Way Comparative Benchmark (n=10)</h2>
+            <div className="text-xs font-bold text-indigo-400 uppercase tracking-wider font-mono">SECTION 1 — REAL LLM EVALUATION BENCHMARK</div>
+            <h2 className="text-lg font-bold text-white mt-0.5">Three-Way Real LLM Comparison (n=10)</h2>
             <p className="text-xs text-slate-400 font-sans mt-0.5">
-              Identical generation parameters: <code className="text-slate-200 font-mono">temperature=0.0</code>, <code className="text-slate-200 font-mono">max_tokens=512</code>, OpenRouter free endpoint.
+              Model: OpenRouter free routed endpoint (<code className="text-slate-300 font-mono">nvidia/nemotron-3-ultra-550b</code>). Temp: 0.0, Max tokens: 512.
             </p>
           </div>
 
           <div className="text-right">
-            <span className="text-[10px] text-amber-400 font-sans block">
-              ⚠️ Low-resource validation experiment; not statistically sufficient for generalization.
+            <span className="text-[10px] text-amber-400 font-mono block">
+              ⚠️ Low-resource validation; not statistically sufficient for generalization.
             </span>
           </div>
         </div>
@@ -95,9 +106,9 @@ export default function BenchmarksPage() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 font-sans">
           {/* Baseline RAG */}
           <div className="p-6 rounded-xl bg-slate-950 border border-red-900/30 space-y-4">
-            <div className="flex justify-between items-center">
-              <span className="text-xs font-bold text-slate-400 uppercase tracking-wider font-mono">BASELINE RAG</span>
-              <span className="text-[10px] text-slate-500 font-mono">CONTROL</span>
+            <div className="flex justify-between items-center font-mono">
+              <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">LIVE BASELINE RAG</span>
+              <span className="text-[10px] text-slate-500">CONTROL</span>
             </div>
 
             <div>
@@ -123,9 +134,9 @@ export default function BenchmarksPage() {
 
           {/* ContextOS Full */}
           <div className="p-5 rounded-xl bg-slate-950 border border-amber-900/30 space-y-4">
-            <div className="flex justify-between items-center">
-              <span className="text-xs font-bold text-amber-400 uppercase tracking-wider font-mono">CONTEXTOS FULL</span>
-              <span className="text-[10px] text-amber-400/80 font-mono">PROMPT BLOAT</span>
+            <div className="flex justify-between items-center font-mono">
+              <span className="text-xs font-bold text-amber-400 uppercase tracking-wider">CONTEXTOS FULL</span>
+              <span className="text-[10px] text-amber-400/80">PROMPT BLOAT</span>
             </div>
 
             <div>
@@ -151,9 +162,9 @@ export default function BenchmarksPage() {
 
           {/* ContextOS Compact */}
           <div className="p-6 rounded-xl bg-slate-950 border border-emerald-500/40 space-y-4">
-            <div className="flex justify-between items-center">
-              <span className="text-xs font-bold text-emerald-400 uppercase tracking-wider font-mono">CONTEXTOS COMPACT</span>
-              <span className="text-[10px] px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 font-mono font-bold">SOLVED BLOAT</span>
+            <div className="flex justify-between items-center font-mono">
+              <span className="text-xs font-bold text-emerald-400 uppercase tracking-wider">CONTEXTOS COMPACT</span>
+              <span className="text-[10px] px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 font-bold">DECISION-GRADE</span>
             </div>
 
             <div>
@@ -177,21 +188,13 @@ export default function BenchmarksPage() {
             </div>
           </div>
         </div>
-
-        {/* Technical Key Takeaway Banner */}
-        <div className="p-4 rounded-lg bg-slate-950 border border-indigo-500/20 text-xs font-sans space-y-1">
-          <div className="font-bold text-indigo-300">Research Takeaway: Context Bloat vs Decision-Grade Compilation</div>
-          <p className="text-slate-400 leading-relaxed">
-            Supplying raw uncompiled context (Full mode: 65,424 tokens) degraded LLM attention, causing accuracy to drop to 50.0%. ContextOS Decision-Grade Context Compiler reduced input tokens by <strong>93.6%</strong> to 4,204 tokens, restoring accuracy to <strong>90.0%</strong>.
-          </p>
-        </div>
       </div>
 
-      {/* DETAILED CATEGORY BENCHMARK TABLE */}
+      {/* CATEGORY BREAKDOWN TABLE */}
       <div className="p-6 rounded-xl bg-[#0d0f17] border border-slate-800/80 space-y-4">
-        <div className="flex justify-between items-center">
-          <div className="text-xs font-bold text-white uppercase tracking-wider">CATEGORY BREAKDOWN (n=10 REAL LLM)</div>
-          <span className="text-[10px] text-slate-500 font-mono">STRATIFIED SAMPLE</span>
+        <div className="flex justify-between items-center font-mono">
+          <div className="text-xs font-bold text-white uppercase tracking-wider">CATEGORY PERFORMANCE BREAKDOWN (n=10 REAL LLM)</div>
+          <span className="text-[10px] text-slate-500">6 CATEGORIES</span>
         </div>
 
         <div className="overflow-x-auto">
@@ -227,17 +230,20 @@ export default function BenchmarksPage() {
         </div>
       </div>
 
-      {/* DETERMINISTIC BENCHMARK SUITE HISTORY (1,000 SCENARIOS) */}
+      {/* SECTION 2: DETERMINISTIC BENCHMARK SIMULATION (1,000 SCENARIOS) */}
       <div className="p-6 rounded-xl bg-[#0d0f17] border border-slate-800/80 space-y-4">
-        <div className="flex justify-between items-center">
-          <div className="text-xs font-bold text-white uppercase tracking-wider">DETERMINISTIC BENCHMARK RUN HISTORY (1,000 SCENARIOS)</div>
-          <span className="text-[10px] text-slate-500 font-mono">PERSISTED IN SQLITE DB</span>
+        <div className="flex justify-between items-center font-mono">
+          <div>
+            <div className="text-xs font-bold text-slate-400 uppercase tracking-wider">SECTION 2 — DETERMINISTIC BENCHMARK SIMULATION (1,000 SCENARIOS)</div>
+            <p className="text-xs text-slate-400 font-sans mt-0.5">Evaluation suite executed deterministically over fixed seed 42 dataset.</p>
+          </div>
+          <span className="text-[10px] text-slate-500">GROUPED RUN HISTORY</span>
         </div>
 
         {loading ? (
           <div className="py-8 text-center text-slate-500 text-xs font-mono">Loading benchmark telemetry from SQLite...</div>
         ) : runs.length === 0 ? (
-          <div className="py-8 text-center text-slate-500 text-xs font-mono">No deterministic benchmark runs recorded yet.</div>
+          <div className="py-8 text-center text-slate-500 text-xs font-mono">No data available</div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs font-mono">
