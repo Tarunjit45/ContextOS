@@ -34,16 +34,10 @@ export default function RootLayout({
             <nav className="space-y-1">
               {[
                 { href: '/', label: 'OVERVIEW' },
-                { href: '/workspaces', label: 'WORKSPACES' },
-                { href: '/scenarios', label: 'SCENARIOS' },
-                { href: '/agents', label: 'AGENTS' },
-                { href: '/evaluations', label: 'EVALUATIONS' },
-                { href: '/evaluations/1247', label: 'EVALUATION #1247', signature: true },
-                { href: '/replay', label: 'CONTEXT REPLAY' },
-                { href: '/graph', label: 'CONTEXT GRAPH' },
-                { href: '/failures', label: 'FAILURES' },
+                { href: '/architecture', label: 'ARCHITECTURE' },
                 { href: '/benchmarks', label: 'BENCHMARKS' },
-                { href: '/experiments', label: 'EXPERIMENTS' },
+                { href: '/evaluations/1247', label: 'EVALUATION #1247', signature: true },
+                { href: '/failures', label: 'FAILURES' },
               ].map((item) => (
                 <Link
                   key={item.href}

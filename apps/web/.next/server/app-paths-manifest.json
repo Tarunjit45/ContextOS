@@ -1,9 +1,6 @@
 {
-  "/_not-found/page": "app/_not-found/page.js",
-  "/benchmarks/page": "app/benchmarks/page.js",
-  "/failures/page": "app/failures/page.js",
-  "/replay/page": "app/replay/page.js",
   "/page": "app/page.js",
-  "/workspaces/page": "app/workspaces/page.js",
-  "/evaluations/[id]/page": "app/evaluations/[id]/page.js"
+  "/benchmarks/page": "app/benchmarks/page.js",
+  "/evaluations/[id]/page": "app/evaluations/[id]/page.js",
+  "/architecture/page": "app/architecture/page.js"
 }

@@ -45,7 +45,7 @@ evaluator = EvaluationEngine()
 storage = BenchmarkStorage()
 runner = BenchmarkRunner()
 
-current_workspace = generator.generate_workspace()
+current_workspace, _ = generator.generate_benchmark_dataset()
 
 class ScenarioGenerateRequest(BaseModel):
     name: str = "Acme Corporation"
