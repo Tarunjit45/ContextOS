@@ -1,0 +1,9 @@
+{
+  "/_not-found/page": "/_not-found",
+  "/benchmarks/page": "/benchmarks",
+  "/page": "/",
+  "/failures/page": "/failures",
+  "/replay/page": "/replay",
+  "/workspaces/page": "/workspaces",
+  "/evaluations/[id]/page": "/evaluations/[id]"
+}

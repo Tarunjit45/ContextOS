@@ -1,0 +1,1 @@
+@tailwind base;@tailwind components;@tailwind utilities;@layer base{body{background-color:#08090d;color:#f1f5f9}}.font-mono{font-family:JetBrains Mono,monospace}::-webkit-scrollbar{width:6px;height:6px}::-webkit-scrollbar-track{background:#0d0e15}::-webkit-scrollbar-thumb{background:#1e293b;border-radius:3px}::-webkit-scrollbar-thumb:hover{background:#334155}
