@@ -1,10 +1,10 @@
 # 🔬 ContextOS Phase 3.1 — Low-Resource Real LLM Evaluation Report
 
-**Execution Timestamp:** `2026-08-10T02:23:57.774007`  
+**Execution Timestamp:** `2026-08-10T02:24:41.148525`  
 **Experiment Mode:** `REAL_LLM_LOCAL_LOW_RESOURCE`  
 **Dataset v1 Hash Status:** `VERIFIED ✓ (SHA256: 2ba2719180060804d7a6fdaf0fd132e27ccb1e78f0a54ec8adff6855f57b12fa)`  
 **Provider:** `mock` | **Model:** `mock-llm` | **Temperature:** `0.0`  
-**Hardware:** 12 CPU Cores | 5.85 GB RAM Total (0.26 GB Available) | GPU: None (CPU Only)  
+**Hardware:** 12 CPU Cores | 5.85 GB RAM Total (0.33 GB Available) | GPU: None (CPU Only)  
 
 > [!IMPORTANT]
 > **Statistical Disclaimer:** `n=10` is a smoke test and is NOT statistically sufficient to establish general performance superiority.
@@ -15,7 +15,7 @@
 |---|---|---|---|---|
 | **Overall Accuracy** | 100.0% | 100.0% | 100.0% | +0.0% |
 | **Hallucination Rate** | 0.0% | 0.0% | 0.0% | +0.0% |
-| **P50 Latency** | 5.18 ms | 183.78 ms | 167.2 ms | +178.6 ms |
+| **P50 Latency** | 5.71 ms | 138.88 ms | 177.76 ms | +133.17 ms |
 | **Total Input Tokens** | 102 | 4621 | 3408 | +4519 |
 | **Total Cost** | $0.0000 | $0.0000 | $0.0000 | N/A |
 

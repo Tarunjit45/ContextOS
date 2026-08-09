@@ -57,19 +57,19 @@ export default function OverviewPage() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* WHAT */}
         <div className="p-6 rounded-xl bg-[#0d0f17] border border-slate-800/80 space-y-3">
-          <div className="text-[10px] font-bold text-indigo-400 uppercase tracking-widest">WHAT IT IS</div>
-          <h2 className="text-base font-bold text-white">Context Failure Diagnostic Engine</h2>
+          <div className="text-[10px] font-bold text-indigo-400 uppercase tracking-widest font-mono">EVALUATION OBJECTIVE</div>
+          <h2 className="text-base font-bold text-white">Context Failure Diagnostics</h2>
           <p className="text-xs text-slate-400 font-sans leading-relaxed">
-            ContextOS evaluates whether autonomous AI agents can remember information across long timelines, resolve temporal state updates, disambiguate entity roles, cut context bloat, and decline ungrounded queries without hallucinating.
+            Evaluates whether autonomous AI agent context pipelines maintain temporal validity, disambiguate entity roles, enforce token budgets, and prevent ungrounded responses across evolving multi-source workspace data.
           </p>
         </div>
 
         {/* WHY */}
         <div className="p-6 rounded-xl bg-[#0d0f17] border border-slate-800/80 space-y-3">
-          <div className="text-[10px] font-bold text-amber-400 uppercase tracking-widest">WHY CONVENTIONAL RAG FAILS</div>
-          <h2 className="text-base font-bold text-white">Semantic Similarity ≠ Operational Context</h2>
+          <div className="text-[10px] font-bold text-amber-400 uppercase tracking-widest font-mono">RAG ARCHITECTURAL BOUNDARIES</div>
+          <h2 className="text-base font-bold text-white">Lexical Similarity ≠ Context Validity</h2>
           <p className="text-xs text-slate-400 font-sans leading-relaxed">
-            Standard BM25/Dense RAG retrieves documents based purely on text similarity. In evolving workspaces, RAG selects outdated hold notices over recent clearances, conflates similar names (`John Smith` VP vs `John Smith Jr.` Associate), and overloads prompts.
+            Standard BM25/dense RAG selects documents by text similarity. In dynamic environments, RAG retrieves superseded hold notices over newer legal clearances, conflates similar entity names, and causes prompt bloat.
           </p>
         </div>
       </div>
