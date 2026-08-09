@@ -76,7 +76,7 @@ export default function BenchmarkComparison() {
         <div className="space-y-2 pt-3 border-t border-[#232731]">
           <div className="flex justify-between text-[#A7ADB8]">
             <span>Input Tokens:</span>
-            <span className="text-[#32D583] font-bold">4,204</span>
+            <span className="text-[#32D583] font-bold">4,204 (-93.6% vs Full)</span>
           </div>
           <div className="flex justify-between text-[#A7ADB8]">
             <span>Hallucination:</span>

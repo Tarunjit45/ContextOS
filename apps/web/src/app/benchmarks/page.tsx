@@ -6,6 +6,8 @@ import ResearchWarning from '../../components/ui/ResearchWarning';
 import BenchmarkComparison from '../../components/benchmark/BenchmarkComparison';
 import TokenEfficiency from '../../components/research/TokenEfficiency';
 import { DataTable } from '../../components/ui/DataTable';
+import Badge from '../../components/ui/Badge';
+import { Server, ShieldCheck, Zap } from 'lucide-react';
 
 interface BenchmarkRun {
   run_id: string;
@@ -52,19 +54,40 @@ export default function BenchmarksPage() {
   return (
     <div className="space-y-8 font-sans text-[#F5F7FA]">
       {/* Header */}
-      <div className="border-b border-[#232731] pb-6 flex items-center justify-between font-mono">
+      <div className="border-b border-[#232731] pb-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 font-mono">
         <div>
-          <h1 className="text-2xl font-semibold text-[#F5F7FA] tracking-tight">Benchmark Laboratory</h1>
-          <p className="text-sm text-[#A7ADB8] mt-1 font-sans">
+          <div className="flex items-center gap-2 mb-1">
+            <h1 className="text-2xl font-semibold text-[#F5F7FA] tracking-tight">Benchmark Laboratory</h1>
+          </div>
+          <p className="text-sm text-[#A7ADB8] font-sans">
             Controlled evaluation of agent context architectures.
           </p>
         </div>
         <Link
           href="/"
-          className="px-3 py-1.5 rounded-md bg-[#111318] border border-[#232731] text-xs font-mono text-[#A7ADB8] hover:text-[#F5F7FA] transition-colors"
+          className="px-3 py-1.5 rounded-md bg-[#111318] border border-[#232731] text-xs font-mono text-[#A7ADB8] hover:text-[#F5F7FA] transition-colors shrink-0"
         >
           ← Overview
         </Link>
+      </div>
+
+      {/* REAL LLM VALIDATION PROMINENT BADGE HEADER */}
+      <div className="p-5 rounded-lg bg-[#111318] border border-[#7C5CFC]/40 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 font-mono text-xs shadow-md">
+        <div className="space-y-1">
+          <div className="flex items-center gap-2">
+            <span className="font-bold text-[#7C5CFC] text-sm tracking-wider uppercase">REAL LLM VALIDATION</span>
+            <span className="px-2 py-0.5 rounded bg-[#7C5CFC]/20 text-[#7C5CFC] font-bold text-[10px] border border-[#7C5CFC]/30">
+              Remote Inference
+            </span>
+          </div>
+          <p className="text-[#A7ADB8] font-sans text-xs">
+            OpenRouter API Provider: <code className="text-[#F5F7FA]">nvidia/nemotron-3-ultra-550b-a55b:free</code> (n=10 scenarios)
+          </p>
+        </div>
+        <div className="flex items-center gap-2 text-xs font-mono shrink-0">
+          <span className="px-3 py-1.5 rounded bg-[#171A20] border border-[#232731] text-[#32D583]">Seed: 42</span>
+          <span className="px-3 py-1.5 rounded bg-[#171A20] border border-[#232731] text-[#4F8CFF]">n = 10</span>
+        </div>
       </div>
 
       {/* TABS */}
@@ -105,7 +128,7 @@ export default function BenchmarksPage() {
           <div className="p-4 rounded-lg bg-[#111318] border border-[#7C5CFC]/30 text-xs font-sans space-y-1">
             <div className="font-bold text-[#7C5CFC] font-mono uppercase text-[11px]">KEY RESEARCH FINDING</div>
             <p className="text-[#A7ADB8] leading-relaxed">
-              Full ContextOS exposed a severe context-bloat problem. Compact ContextOS reduced the context payload by 93.6% while reaching 90% accuracy in this n=10 validation.
+              Full ContextOS exposed a severe context-bloat problem (65,424 tokens at 50% accuracy). Decision-Grade Context Compiler reduced the context payload by 93.6% while reaching 90% accuracy in this n=10 validation.
             </p>
           </div>
 
