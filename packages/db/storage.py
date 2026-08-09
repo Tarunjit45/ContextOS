@@ -1,12 +1,11 @@
 """
-ContextOS Phase 2 — Persistent Database & Benchmark Storage Module
-Uses SQLite (contextos_benchmark.db) for local zero-config persistence and supports PostgreSQL.
+ContextOS Phase 2.2 — Persistent Database & Benchmark Storage Module
+Uses SQLite (contextos_benchmark.db) for local zero-config persistence.
 """
 
 import sqlite3
 import json
 import os
-import time
 from typing import Dict, List, Any, Optional
 
 DB_PATH = os.path.join(os.path.dirname(__file__), "..", "..", "benchmarks", "contextos_benchmark.db")
@@ -77,9 +76,9 @@ class BenchmarkStorage:
                 run_summary["agent_name"],
                 run_summary["scenario_count"],
                 run_summary["overall_accuracy"],
-                run_summary["memory_retention"],
-                run_summary["temporal_reasoning"],
-                run_summary["entity_disambiguation"],
+                run_summary.get("memory_recall", run_summary.get("memory_retention", 0.0)),
+                run_summary.get("temporal_state_accuracy", run_summary.get("temporal_reasoning", 0.0)),
+                run_summary.get("entity_resolution_accuracy", run_summary.get("entity_disambiguation", 0.0)),
                 run_summary["evidence_grounding"],
                 run_summary["hallucination_rate"],
                 run_summary["p50_latency_ms"],
@@ -115,19 +114,3 @@ class BenchmarkStorage:
             cursor.execute("SELECT * FROM benchmark_runs ORDER BY timestamp DESC LIMIT ?", (limit,))
             rows = cursor.fetchall()
             return [dict(row) for row in rows]
-
-    def get_run_details(self, run_id: str) -> Optional[Dict[str, Any]]:
-        with self.get_connection() as conn:
-            cursor = conn.cursor()
-            cursor.execute("SELECT * FROM benchmark_runs WHERE run_id = ?", (run_id,))
-            run_row = cursor.fetchone()
-            if not run_row:
-                return None
-            
-            cursor.execute("SELECT * FROM benchmark_traces WHERE run_id = ?", (run_id,))
-            trace_rows = cursor.fetchall()
-
-            return {
-                "summary": dict(run_row),
-                "traces": [dict(r) for r in trace_rows]
-            }

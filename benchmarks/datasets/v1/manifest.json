@@ -1,0 +1,8 @@
+{
+  "dataset_version": "1.0.0",
+  "seed": 42,
+  "scenario_count": 1000,
+  "generator_version": "2.1.0",
+  "generation_timestamp": "2026-08-09T23:00:25.135213",
+  "sha256_hash": "2ba2719180060804d7a6fdaf0fd132e27ccb1e78f0a54ec8adff6855f57b12fa"
+}

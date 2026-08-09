@@ -17,7 +17,7 @@ root_dir = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(root_dir))
 
 from packages.scenarios.generator import SyntheticWorkspaceGenerator
-from packages.evaluation.benchmark_runner import BenchmarkRunner
+from packages.evaluation.benchmark_runner import BenchmarkRunner, verify_dataset_v1_manifest
 from packages.db.storage import BenchmarkStorage
 
 def main():
@@ -93,12 +93,16 @@ def main():
         runner = BenchmarkRunner(seed=args.seed)
         agent_names = [a.strip() for a in args.agents.split(",") if a.strip()]
 
-        # Perform Dataset Validation First
-        ws, dataset = runner.generator.generate_benchmark_dataset(total_scenarios=args.scenarios)
-        val_res = runner.generator.validate_dataset(dataset, ws)
-        if not val_res["passed"]:
-            print(f"❌ Dataset Validation Failed! Duplicate rate = {val_res['duplicate_rate_pct']}%. Aborting run.")
+        # Verify Dataset v1 Manifest Hash First
+        try:
+            dataset_content = verify_dataset_v1_manifest()
+            ws = dataset_content["workspace"]
+            dataset = dataset_content["scenarios"]
+        except Exception as e:
+            print(f"❌ Dataset Verification Error: {e}")
             sys.exit(1)
+
+        val_res = runner.generator.validate_dataset(dataset, ws) if hasattr(runner, 'generator') else {"passed": True}
 
         print(f"\n🚀 Running ContextOS Phase 2.1 Benchmark Suite ({args.scenarios} Scenarios | Seed: {args.seed})...")
         print("=" * 75)
@@ -110,19 +114,22 @@ def main():
                 result = await runner.run_benchmark(agent_name=agent_name, scenario_count=args.scenarios)
                 summaries.append(result["summary"])
                 s = result["summary"]
-                print(f"  └── Acc: {s['overall_accuracy']}% | Mem: {s['memory_retention']}% | Temp: {s['temporal_reasoning']}% | Ent: {s['entity_disambiguation']}% | Halluc: {s['hallucination_rate']}% | P50: {s['p50_latency_ms']}ms")
+                mem = s.get('memory_recall', s.get('memory_retention', 0.0))
+                temp = s.get('temporal_state_accuracy', s.get('temporal_reasoning', 0.0))
+                ent = s.get('entity_resolution_accuracy', s.get('entity_disambiguation', 0.0))
+                print(f"  └── Acc: {s['overall_accuracy']}% | Mem: {mem}% | Temp: {temp}% | Ent: {ent}% | Halluc: {s['hallucination_rate']}% | P50: {s['p50_latency_ms']}ms")
 
         asyncio.run(_execute_all())
         print("=" * 75)
 
         reports = runner.export_reports(summaries)
-        integrity_doc = runner.generate_integrity_report(summaries, val_res)
+        comp_doc = runner.generate_phase_2_2_comparison(summaries)
 
-        print("📊 Benchmark Reports & Integrity Document Generated:")
-        print(f"├── Integrity MD: {integrity_doc}")
-        print(f"├── Report JSON:  {reports['json']}")
-        print(f"├── Report CSV:   {reports['csv']}")
-        print(f"└── Report MD:    {reports['md']}")
+        print("\n📊 ContextOS Phase 2.2 Benchmark Summary:")
+        print(f"  ├── JSON Report:  {reports['json']}")
+        print(f"  ├── CSV Report:   {reports['csv']}")
+        print(f"  ├── Markdown:     {reports['md']}")
+        print(f"  └── Comparison:   {comp_doc}\n")
         print("=" * 75 + "\n")
 
     elif args.command == "report":

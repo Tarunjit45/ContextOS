@@ -1,0 +1,42 @@
+[
+  {
+    "run_id": "run_baseline_rag_agent_1786297180",
+    "timestamp": "2026-08-09T23:09:40.336254",
+    "agent_name": "Baseline RAG Agent",
+    "scenario_count": 1000,
+    "overall_accuracy": 69.1,
+    "retrieval_recall": 62.5,
+    "retrieval_precision": 23.3,
+    "memory_recall": 94.0,
+    "entity_resolution_accuracy": 0.0,
+    "temporal_state_accuracy": 100.0,
+    "relationship_path_accuracy": 100.0,
+    "context_composition_accuracy": 69.1,
+    "evidence_grounding": 22.1,
+    "hallucination_rate": 10.0,
+    "p50_latency_ms": 2.46,
+    "p95_latency_ms": 5.7,
+    "generation_mode": "deterministic",
+    "seed": 42
+  },
+  {
+    "run_id": "run_contextos_agent_1786297183",
+    "timestamp": "2026-08-09T23:09:43.185688",
+    "agent_name": "ContextOS Agent",
+    "scenario_count": 1000,
+    "overall_accuracy": 99.0,
+    "retrieval_recall": 62.5,
+    "retrieval_precision": 2.3,
+    "memory_recall": 93.3,
+    "entity_resolution_accuracy": 100.0,
+    "temporal_state_accuracy": 100.0,
+    "relationship_path_accuracy": 100.0,
+    "context_composition_accuracy": 99.0,
+    "evidence_grounding": 2.3,
+    "hallucination_rate": 0.0,
+    "p50_latency_ms": 19.72,
+    "p95_latency_ms": 37.29,
+    "generation_mode": "deterministic",
+    "seed": 42
+  }
+]

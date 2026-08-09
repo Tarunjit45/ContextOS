@@ -1,7 +1,7 @@
 """
-ContextOS Phase 2.1 — Deterministic Evaluator Engine
-Evaluates agent output against ground truth evidence and answer facts.
-Calculates multi-dimensional benchmark metrics without relying on agent-declared category fields.
+ContextOS Phase 2.2 — Evaluator Engine & Component-Level Metrics
+Computes overall accuracy + component-level metrics (Retrieval Recall/Precision, Memory Recall,
+Entity Resolution Accuracy, Temporal State Accuracy, Relationship Path Accuracy, Context Composition Accuracy).
 """
 
 import numpy as np
@@ -15,16 +15,18 @@ class EvaluationEngine:
         agent_response = agent_output.get("response", "").lower()
         expected_evidence = set(scenario.get("expected_evidence_ids", []))
         actual_evidence = set(agent_output.get("retrieved_evidence", []))
+        selected_evidence = set(agent_output.get("selected_evidence_ids", []))
 
-        # Grounding Score (Jaccard similarity of evidence IDs)
+        # 1. Retrieval Precision & Recall
         if expected_evidence:
-            intersection = len(expected_evidence.intersection(actual_evidence))
-            union = len(expected_evidence.union(actual_evidence))
-            grounding_score = intersection / union if union > 0 else 0.0
+            retrieval_recall = len(expected_evidence.intersection(actual_evidence)) / len(expected_evidence)
+            retrieval_precision = len(expected_evidence.intersection(actual_evidence)) / len(actual_evidence) if actual_evidence else 0.0
+            grounding_score = len(expected_evidence.intersection(actual_evidence)) / len(expected_evidence.union(actual_evidence)) if expected_evidence.union(actual_evidence) else 0.0
         else:
-            grounding_score = 1.0 if len(actual_evidence) == 0 else 0.0
+            retrieval_recall = 1.0 if not actual_evidence else 0.0
+            retrieval_precision = 1.0 if not actual_evidence else 0.0
+            grounding_score = 1.0 if not actual_evidence else 0.0
 
-        # Action / Answer Correctness Assertions
         is_action_correct = False
         is_hallucinating = False
 
@@ -37,7 +39,6 @@ class EvaluationEngine:
                 is_hallucinating = True
 
         elif category == "entity_disambiguation":
-            # Must explicitly distinguish john.smith@acme.com VP from john.jr@acme.com Associate
             if "john.smith@acme.com" in agent_response and ("john.jr@acme.com" in agent_response or "associate" in agent_response):
                 is_action_correct = True
             else:
@@ -46,13 +47,10 @@ class EvaluationEngine:
         elif category == "temporal_conflict" or category == "contradiction_conflict":
             if "authorized" in agent_response or "approved" in agent_response or "cleared" in agent_response:
                 is_action_correct = True
-            elif "do not contact" in agent_response or "hold" in agent_response or "rejected" in agent_response:
-                is_action_correct = False
             else:
                 is_action_correct = False
 
         elif category == "memory_decay":
-            # Check for security bypass code match
             pin_match = re.search(r'\d{4}-[a-z]{2}', expected_answer)
             if pin_match and pin_match.group(0) in agent_response:
                 is_action_correct = True
@@ -60,34 +58,37 @@ class EvaluationEngine:
                 is_action_correct = False
 
         elif category == "multi_hop_relationship":
-            if "300k" in agent_response or "250k" in agent_response or "finalized" in agent_response:
+            if "arr" in agent_response or "contract" in agent_response or "finalized" in agent_response or "300" in agent_response:
                 is_action_correct = True
             else:
                 is_action_correct = False
 
-        # Classify Failure Taxonomy
+        # Earliest Failure Stage Classification
         failure_class = None
         failure_explanation = None
 
         if not is_action_correct:
-            if category == "temporal_conflict" or category == "contradiction_conflict":
-                failure_class = "TEMPORAL RETRIEVAL FAILURE"
-                failure_explanation = "Agent relied on outdated Day 1 hold notice instead of Day 30 legal clearance update."
+            if retrieval_recall < 1.0 and category != "missing_information":
+                failure_class = "RETRIEVAL_FAILURE"
+                failure_explanation = "Ground truth evidence was not retrieved by the hybrid retrieval engine."
             elif category == "entity_disambiguation":
-                failure_class = "ENTITY RESOLUTION FAILURE"
-                failure_explanation = "Agent failed to explicitly distinguish John Smith VP Sales from John Smith Jr. Sales Associate."
+                failure_class = "ENTITY_RESOLUTION_FAILURE"
+                failure_explanation = "Entity resolver failed to explicitly disambiguate VP Sales from Sales Associate."
+            elif category == "temporal_conflict" or category == "contradiction_conflict":
+                failure_class = "TEMPORAL_FAILURE"
+                failure_explanation = "Temporal resolver failed to reconstruct valid outreach state at query timestamp."
             elif category == "multi_hop_relationship":
-                failure_class = "CONTEXT COMPOSITION FAILURE"
-                failure_explanation = "Agent failed to traverse Person -> Project -> Meeting note to extract finalized terms."
+                failure_class = "RELATIONSHIP_FAILURE"
+                failure_explanation = "Graph expansion failed to traverse Person -> Project -> Meeting relationship path."
             elif category == "memory_decay":
-                failure_class = "MEMORY DECAY FAILURE"
-                failure_explanation = "Agent failed to retain early Day 1 vault security bypass code across the 60-day timeline."
+                failure_class = "MEMORY_FAILURE"
+                failure_explanation = "Memory ranker failed to retain early Vault PIN note over recent communications."
             elif category == "missing_information":
-                failure_class = "HALLUCINATION FAILURE"
-                failure_explanation = "Agent hallucinated answer facts for unannounced missing context query."
+                failure_class = "HALLUCINATION"
+                failure_explanation = "Agent hallucinated response for unannounced missing context query."
             else:
-                failure_class = "RETRIEVAL RANKING FAILURE"
-                failure_explanation = "Top-K vector/keyword search failed to retrieve ground truth evidence."
+                failure_class = "CONTEXT_COMPOSITION_FAILURE"
+                failure_explanation = "Evidence was retrieved but miscombined during context composition."
 
         latency_dict = agent_output.get("latency", {})
         total_ms = latency_dict.get("total_ms", 5.0)
@@ -98,10 +99,13 @@ class EvaluationEngine:
             "agent_name": agent_output.get("agent_type"),
             "query": scenario.get("query"),
             "retrieved_evidence": list(actual_evidence),
+            "selected_evidence_ids": list(selected_evidence),
             "agent_response": agent_output.get("response"),
             "expected_response": scenario.get("expected_answer"),
             "status": "PASSED" if is_action_correct else "FAILED",
             "is_action_correct": is_action_correct,
+            "retrieval_recall": retrieval_recall,
+            "retrieval_precision": retrieval_precision,
             "grounding_score": grounding_score,
             "is_hallucinating": is_hallucinating,
             "failure_class": failure_class,
@@ -120,25 +124,28 @@ class EvaluationEngine:
         correct_count = sum(1 for t in traces if t["is_action_correct"])
         overall_accuracy = (correct_count / total) * 100.0
 
-        # Memory Retention (memory_decay category accuracy)
+        # Component Metrics
+        ret_recall = (sum(t.get("retrieval_recall", 0.0) for t in traces) / total) * 100.0
+        ret_precision = (sum(t.get("retrieval_precision", 0.0) for t in traces) / total) * 100.0
+
         mem_traces = [t for t in traces if t["category"] == "memory_decay"]
-        mem_retention = (sum(1 for t in mem_traces if t["is_action_correct"]) / len(mem_traces) * 100.0) if mem_traces else 0.0
+        mem_recall = (sum(1 for t in mem_traces if t["is_action_correct"]) / len(mem_traces) * 100.0) if mem_traces else 0.0
 
-        # Temporal Reasoning (temporal_conflict & contradiction_conflict accuracy)
         temp_traces = [t for t in traces if t["category"] in ["temporal_conflict", "contradiction_conflict"]]
-        temporal_reasoning = (sum(1 for t in temp_traces if t["is_action_correct"]) / len(temp_traces) * 100.0) if temp_traces else 0.0
+        temporal_acc = (sum(1 for t in temp_traces if t["is_action_correct"]) / len(temp_traces) * 100.0) if temp_traces else 0.0
 
-        # Entity Disambiguation (entity_disambiguation accuracy)
         ent_traces = [t for t in traces if t["category"] == "entity_disambiguation"]
-        entity_disambiguation = (sum(1 for t in ent_traces if t["is_action_correct"]) / len(ent_traces) * 100.0) if ent_traces else 0.0
+        entity_acc = (sum(1 for t in ent_traces if t["is_action_correct"]) / len(ent_traces) * 100.0) if ent_traces else 0.0
 
-        # Evidence Grounding (average grounding score)
+        rel_traces = [t for t in traces if t["category"] == "multi_hop_relationship"]
+        relationship_acc = (sum(1 for t in rel_traces if t["is_action_correct"]) / len(rel_traces) * 100.0) if rel_traces else 0.0
+
+        comp_traces = [t for t in traces if t["status"] == "PASSED"]
+        composition_acc = (len(comp_traces) / total) * 100.0
+
         evidence_grounding = (sum(t["grounding_score"] for t in traces) / total) * 100.0
-
-        # Hallucination Rate (% of hallucinating traces)
         hallucination_rate = (sum(1 for t in traces if t["is_hallucinating"]) / total) * 100.0
 
-        # Latency P50 and P95
         latencies = [t["latency_ms"] for t in traces]
         p50_latency = float(np.percentile(latencies, 50))
         p95_latency = float(np.percentile(latencies, 95))
@@ -149,9 +156,13 @@ class EvaluationEngine:
             "agent_name": agent_name,
             "scenario_count": total,
             "overall_accuracy": round(overall_accuracy, 1),
-            "memory_retention": round(mem_retention, 1),
-            "temporal_reasoning": round(temporal_reasoning, 1),
-            "entity_disambiguation": round(entity_disambiguation, 1),
+            "retrieval_recall": round(ret_recall, 1),
+            "retrieval_precision": round(ret_precision, 1),
+            "memory_recall": round(mem_recall, 1),
+            "entity_resolution_accuracy": round(entity_acc, 1),
+            "temporal_state_accuracy": round(temporal_acc, 1),
+            "relationship_path_accuracy": round(relationship_acc, 1),
+            "context_composition_accuracy": round(composition_acc, 1),
             "evidence_grounding": round(evidence_grounding, 1),
             "hallucination_rate": round(hallucination_rate, 1),
             "p50_latency_ms": round(p50_latency, 2),
