@@ -2,10 +2,11 @@
 
 import React from 'react';
 import Link from 'next/link';
+import EvidenceCard from '../../../components/evaluation/EvidenceCard';
+import Timeline from '../../../components/evaluation/Timeline';
 
 interface EvidenceItem {
   source: string;
-  type: string;
   timestamp: string;
   entity: string;
   relevance: string;
@@ -16,7 +17,6 @@ interface EvidenceItem {
 const EVIDENCE_CARDS: EvidenceItem[] = [
   {
     source: 'SLACK',
-    type: 'slack',
     timestamp: '2026-01-14 14:00:00',
     entity: 'Initech (comp_4)',
     relevance: 'High (0.95)',
@@ -25,7 +25,6 @@ const EVIDENCE_CARDS: EvidenceItem[] = [
   },
   {
     source: 'NOTE',
-    type: 'note',
     timestamp: '2026-01-10 10:00:00',
     entity: 'Initech (comp_4)',
     relevance: 'High (0.91)',
@@ -34,7 +33,6 @@ const EVIDENCE_CARDS: EvidenceItem[] = [
   },
   {
     source: 'CRM',
-    type: 'crm',
     timestamp: '2026-01-01 09:00:00',
     entity: 'John Smith (p_1)',
     relevance: 'Medium (0.65)',
@@ -124,41 +122,17 @@ export default function SignatureEvaluationPage() {
           <span className="text-[#66707D]">PROVENANCE EVIDENCE</span>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 font-mono text-xs">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {EVIDENCE_CARDS.map((ev, i) => (
-            <div
+            <EvidenceCard
               key={i}
-              className={`p-4 rounded-lg bg-[#15181D] border space-y-2.5 ${
-                ev.status === 'WINNING'
-                  ? 'border-[#22C55E]/40'
-                  : ev.status === 'SUPERSEDED'
-                  ? 'border-[#F59E0B]/30'
-                  : 'border-[#252A31]'
-              }`}
-            >
-              <div className="flex justify-between items-center text-[11px]">
-                <span className="font-bold text-[#7C5CFC]">{ev.source}</span>
-                <span
-                  className={`text-[9px] px-1.5 py-0.5 rounded font-bold ${
-                    ev.status === 'WINNING'
-                      ? 'bg-[#22C55E]/10 text-[#22C55E]'
-                      : 'bg-[#F59E0B]/10 text-[#F59E0B]'
-                  }`}
-                >
-                  {ev.status}
-                </span>
-              </div>
-
-              <div className="text-[10px] text-[#66707D] space-y-0.5">
-                <div>Timestamp: {ev.timestamp}</div>
-                <div>Entity: {ev.entity}</div>
-                <div>Relevance: {ev.relevance}</div>
-              </div>
-
-              <p className="text-xs text-[#F4F5F7] font-sans pt-1 leading-relaxed border-t border-[#252A31]">
-                "{ev.content}"
-              </p>
-            </div>
+              source={ev.source}
+              timestamp={ev.timestamp}
+              entity={ev.entity}
+              relevance={ev.relevance}
+              content={ev.content}
+              status={ev.status}
+            />
           ))}
         </div>
       </div>
@@ -167,29 +141,13 @@ export default function SignatureEvaluationPage() {
       <div className="p-6 rounded-lg bg-[#111419] border border-[#252A31] space-y-4 font-mono text-xs">
         <span className="font-bold text-[#F4F5F7] uppercase tracking-wider block">RECONSTRUCTED STATE TIMELINE</span>
 
-        <div className="p-5 rounded-lg bg-[#15181D] border border-[#252A31] flex flex-col md:flex-row justify-around items-center gap-4 text-center">
-          <div className="space-y-1">
-            <div className="text-[#66707D] text-[10px]">Jan 10</div>
-            <div className="text-[#EF4444] font-bold text-sm">LEGAL HOLD</div>
-            <div className="text-[#66707D] text-[10px]">Note m_1</div>
-          </div>
-
-          <div className="text-[#7C5CFC] font-bold text-base">↓</div>
-
-          <div className="space-y-1">
-            <div className="text-[#66707D] text-[10px]">Jan 14</div>
-            <div className="text-[#22C55E] font-bold text-sm">LEGAL CLEARANCE</div>
-            <div className="text-[#66707D] text-[10px]">Slack m_2</div>
-          </div>
-
-          <div className="text-[#22C55E] font-bold text-base">↓</div>
-
-          <div className="space-y-1">
-            <div className="text-[#66707D] text-[10px]">CURRENT STATE</div>
-            <div className="text-[#22C55E] font-bold text-sm">CONTACT PERMITTED</div>
-            <div className="text-[#22C55E] text-[10px]">Valid As Of 2026-01-14</div>
-          </div>
-        </div>
+        <Timeline
+          events={[
+            { date: 'Jan 10', label: 'LEGAL HOLD', source: 'Note m_1', status: 'error' },
+            { date: 'Jan 14', label: 'LEGAL CLEARANCE', source: 'Slack m_2', status: 'success' },
+            { date: 'CURRENT STATE', label: 'CONTACT PERMITTED', source: 'Valid As Of 2026-01-14', status: 'active' },
+          ]}
+        />
       </div>
 
       {/* ROOT CAUSE & WHY CONTEXTOS SUCCEEDED */}

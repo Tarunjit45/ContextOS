@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import FailureCard from '../../components/failures/FailureCard';
 
 interface FailureClassDetail {
   id: string;
@@ -167,35 +168,17 @@ export default function FailureAnalysisPage() {
         <div className="text-[#66707D] font-bold uppercase tracking-wider">DIAGNOSTIC FAILURE CLASSES</div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
-          {FAILURE_CLASSES.map((fc) => {
-            const isSelected = selectedClass.id === fc.id;
-            return (
-              <div
-                key={fc.id}
-                onClick={() => setSelectedClass(fc)}
-                className={`p-5 rounded-lg border cursor-pointer flex flex-col justify-between space-y-3 transition-colors ${
-                  isSelected
-                    ? 'bg-[#15181D] border-[#7C5CFC] shadow-sm'
-                    : 'bg-[#111419] border-[#252A31] hover:border-[#9BA3AF]'
-                }`}
-              >
-                <div className="space-y-1">
-                  <div className="flex justify-between items-center text-[10px]">
-                    <span className="text-[#7C5CFC] font-bold">{fc.key}</span>
-                    <span className="text-[#9BA3AF] font-bold">{fc.count} cases</span>
-                  </div>
-                  <div className="font-bold text-[#F4F5F7] text-sm font-sans">{fc.name}</div>
-                  <p className="text-xs text-[#9BA3AF] font-sans leading-relaxed pt-1">
-                    {fc.explanation}
-                  </p>
-                </div>
-
-                <button className="w-full py-1.5 rounded bg-[#15181D] border border-[#252A31] text-center font-bold text-[#7C5CFC] hover:border-[#7C5CFC] transition-colors">
-                  {isSelected ? 'INSPECTING CASES ●' : 'VIEW CASES →'}
-                </button>
-              </div>
-            );
-          })}
+          {FAILURE_CLASSES.map((fc) => (
+            <FailureCard
+              key={fc.id}
+              keyTag={fc.key}
+              name={fc.name}
+              count={fc.count}
+              explanation={fc.explanation}
+              isSelected={selectedClass.id === fc.id}
+              onClick={() => setSelectedClass(fc)}
+            />
+          ))}
         </div>
       </div>
 

@@ -3,6 +3,8 @@
 import React from 'react';
 import Link from 'next/link';
 import ResearchWarning from '../components/ui/ResearchWarning';
+import PipelineDiagram from '../components/architecture/PipelineDiagram';
+import MetricCard from '../components/ui/MetricCard';
 
 export default function OverviewPage() {
   return (
@@ -49,31 +51,7 @@ export default function OverviewPage() {
       </div>
 
       {/* COMPACT ARCHITECTURE PIPELINE NODES */}
-      <div className="p-6 rounded-lg bg-[#111419] border border-[#252A31] space-y-4">
-        <div className="flex justify-between items-center font-mono">
-          <span className="text-xs font-bold text-[#F4F5F7] uppercase tracking-wider">CONTEXT COMPILER PIPELINE</span>
-          <span className="text-[11px] text-[#66707D]">8 CONNECTED STAGES</span>
-        </div>
-
-        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-2 text-center font-mono text-xs">
-          {[
-            { title: 'QUERY', desc: 'Input Query' },
-            { title: 'HYBRID RETRIEVAL', desc: 'BM25 + Recency' },
-            { title: 'ENTITY RESOLUTION', desc: 'Role Scoring' },
-            { title: 'TEMPORAL STATE', desc: 'Valid Intervals' },
-            { title: 'MEMORY RANKING', desc: 'Importance' },
-            { title: 'CONTEXT GRAPH', desc: 'NetworkX Paths' },
-            { title: 'CONTEXT COMPOSITION', desc: 'Budget Guard' },
-            { title: 'LLM', desc: 'Compact Output' }
-          ].map((stage, idx) => (
-            <div key={idx} className="p-3 rounded-lg bg-[#15181D] border border-[#252A31] flex flex-col justify-between space-y-1">
-              <span className="text-[10px] text-[#7C5CFC] font-bold">0{idx + 1}</span>
-              <span className="text-[11px] font-bold text-[#F4F5F7]">{stage.title}</span>
-              <span className="text-[9px] text-[#66707D]">{stage.desc}</span>
-            </div>
-          ))}
-        </div>
-      </div>
+      <PipelineDiagram />
 
       {/* RESEARCH SNAPSHOT (n=10) */}
       <div className="p-6 rounded-lg bg-[#111419] border border-[#252A31] space-y-5">
@@ -84,26 +62,27 @@ export default function OverviewPage() {
           </span>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 font-mono">
-          <div className="p-5 rounded-lg bg-[#15181D] border border-[#22C55E]/30 space-y-1">
-            <div className="text-3xl font-bold text-[#22C55E]">90%</div>
-            <div className="text-xs text-[#9BA3AF] font-sans">ContextOS Compact accuracy</div>
-          </div>
-
-          <div className="p-5 rounded-lg bg-[#15181D] border border-[#EF4444]/30 space-y-1">
-            <div className="text-3xl font-bold text-[#EF4444]">50%</div>
-            <div className="text-xs text-[#9BA3AF] font-sans">Baseline RAG accuracy</div>
-          </div>
-
-          <div className="p-5 rounded-lg bg-[#15181D] border border-[#7C5CFC]/30 space-y-1">
-            <div className="text-3xl font-bold text-[#7C5CFC]">93.6%</div>
-            <div className="text-xs text-[#9BA3AF] font-sans">Input-token reduction vs ContextOS Full</div>
-          </div>
-
-          <div className="p-5 rounded-lg bg-[#15181D] border border-[#252A31] space-y-1">
-            <div className="text-3xl font-bold text-[#F4F5F7]">n=10</div>
-            <div className="text-xs text-[#9BA3AF] font-sans">Real LLM validation sample</div>
-          </div>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <MetricCard
+            value="90%"
+            label="ContextOS Compact accuracy"
+            variant="success"
+          />
+          <MetricCard
+            value="50%"
+            label="Baseline RAG accuracy"
+            variant="error"
+          />
+          <MetricCard
+            value="93.6%"
+            label="Input-token reduction vs ContextOS Full"
+            variant="accent"
+          />
+          <MetricCard
+            value="n=10"
+            label="Real LLM validation sample"
+            variant="default"
+          />
         </div>
 
         <ResearchWarning message="Low-resource validation. Not statistically sufficient for generalization across arbitrary enterprise workloads." />
@@ -123,7 +102,7 @@ export default function OverviewPage() {
 
           <div className="p-6 rounded-lg bg-[#111419] border border-[#252A31] space-y-2">
             <div className="text-xs font-bold font-mono text-[#7C5CFC] uppercase tracking-wider">ENTITY RESOLUTION</div>
-            <div className="text-base font-semibold text-[#F4F5F7]">Disambiguate Similar Entities</div>
+            <h3 className="text-base font-semibold text-[#F4F5F7]">Disambiguate Similar Entities</h3>
             <p className="text-xs text-[#9BA3AF] leading-relaxed">
               Distinguish individuals sharing names across channels (e.g. John Smith VP Sales vs John Smith Jr. Sales Associate).
             </p>
@@ -131,7 +110,7 @@ export default function OverviewPage() {
 
           <div className="p-6 rounded-lg bg-[#111419] border border-[#252A31] space-y-2">
             <div className="text-xs font-bold font-mono text-[#7C5CFC] uppercase tracking-wider">CONTEXT COMPOSITION</div>
-            <div className="text-base font-semibold text-[#F4F5F7]">Compact Decision Context</div>
+            <h3 className="text-base font-semibold text-[#F4F5F7]">Compact Decision Context</h3>
             <p className="text-xs text-[#9BA3AF] leading-relaxed">
               Convert large retrieved context dumps into decision-relevant structured evidence, cutting token bloat by 93.6%.
             </p>
