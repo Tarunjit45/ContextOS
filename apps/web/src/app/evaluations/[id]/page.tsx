@@ -15,17 +15,17 @@ export default function ForensicEvaluationPage() {
         <span className="text-white font-bold">#1247</span>
       </div>
 
-      {/* Screen Title */}
+      {/* Screen Title & Category Badge */}
       <div className="border-b border-slate-800 pb-4 flex justify-between items-center">
         <div>
           <div className="flex items-center gap-3">
-            <h1 className="text-xl font-bold text-white tracking-tight">EVALUATION TRACE #1247</h1>
-            <span className="px-2 py-0.5 rounded bg-amber-500/10 text-amber-400 border border-amber-500/20 text-[10px] font-mono">
-              FAILED ON BASELINE
+            <h1 className="text-xl font-bold text-white tracking-tight">EVALUATION #1247</h1>
+            <span className="px-2.5 py-0.5 rounded bg-amber-500/10 text-amber-400 border border-amber-500/20 text-xs font-bold">
+              TEMPORAL CONFLICT
             </span>
           </div>
           <p className="text-xs text-slate-400 font-sans mt-0.5">
-            Forensic diagnostic trace log comparing Baseline RAG and ContextOS Decision-Grade Context Compiler.
+            Diagnostic trace log explaining why Baseline RAG failed and why ContextOS Compact succeeded.
           </p>
         </div>
 
@@ -37,20 +37,20 @@ export default function ForensicEvaluationPage() {
         </Link>
       </div>
 
-      {/* 1. TASK SECTION */}
-      <div className="p-6 rounded-xl bg-[#0d0f17] border border-slate-800/80 space-y-2">
-        <div className="text-[10px] text-slate-500 uppercase tracking-widest font-bold">1. TASK & QUERY</div>
-        <div className="text-base font-bold text-white font-sans">
-          "Is outreach to Initech regarding Project #1001 currently authorized as of 2026-01-14?"
+      {/* 1. TASK */}
+      <div className="p-6 rounded-xl bg-[#0d0f17] border border-slate-800/80 space-y-2 font-sans">
+        <div className="text-[10px] text-slate-500 uppercase tracking-widest font-bold font-mono">1. TASK & QUERY</div>
+        <div className="text-base font-bold text-white">
+          "Should we follow up with Initech regarding Project #1001?"
         </div>
         <div className="text-xs text-slate-400 font-mono">
           Ground Truth Answer: <span className="text-emerald-400 font-bold">"Yes, legal audit cleared for Initech Project #1001 on 2026-01-14 and outreach is authorized."</span>
         </div>
       </div>
 
-      {/* 2. BASELINE vs CONTEXTOS AGENT COMPARISON GRID */}
+      {/* 2. BASELINE RAG vs CONTEXTOS DECISION COMPARISON */}
       <div className="space-y-2">
-        <div className="text-[10px] text-slate-500 uppercase tracking-widest font-bold">2. AGENT DECISION COMPARISON</div>
+        <div className="text-[10px] text-slate-500 uppercase tracking-widest font-bold">2. BASELINE RAG vs CONTEXTOS DECISION COMPARISON</div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* BASELINE RAG */}
           <div className="p-6 rounded-xl bg-[#0d0f17] border border-red-900/50 space-y-4">
@@ -60,7 +60,7 @@ export default function ForensicEvaluationPage() {
             </div>
 
             <div>
-              <div className="text-xs text-slate-500 uppercase">Agent Decision</div>
+              <div className="text-xs text-slate-500 uppercase">Decision</div>
               <div className="text-lg font-bold text-red-400">PROHIBITED (HOLD ACTIVE)</div>
               <div className="text-xs text-slate-400 font-sans mt-1">
                 Model response: <em className="text-slate-300">"No, outreach is currently prohibited due to active legal audit hold."</em>
@@ -81,7 +81,7 @@ export default function ForensicEvaluationPage() {
             </div>
 
             <div>
-              <div className="text-xs text-slate-500 uppercase">Agent Decision</div>
+              <div className="text-xs text-slate-500 uppercase">Decision</div>
               <div className="text-lg font-bold text-emerald-400">AUTHORIZED (CLEARANCE VALID)</div>
               <div className="text-xs text-slate-400 font-sans mt-1">
                 Model response: <em className="text-slate-300">"Yes, outreach to Initech regarding Project #1001 is authorized as legal audit cleared on 2026-01-14."</em>
@@ -96,36 +96,14 @@ export default function ForensicEvaluationPage() {
         </div>
       </div>
 
-      {/* 3. CONTEXT TRACE & PROVENANCE */}
+      {/* 3. CONTEXT TRACE & TIMELINE */}
       <div className="p-6 rounded-xl bg-[#0d0f17] border border-slate-800/80 space-y-5">
-        <div className="text-[10px] text-slate-500 uppercase tracking-widest font-bold">3. CONTEXT TRACE & PROVENANCE EVIDENCE</div>
+        <div className="text-[10px] text-slate-500 uppercase tracking-widest font-bold">3. CONTEXT TRACE & TIMELINE TRANSITION</div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-xs font-sans">
-          {/* Retrieved Evidence */}
+          {/* Timeline Trace */}
           <div className="space-y-3">
-            <div className="text-xs font-bold text-slate-300 font-mono uppercase">Evidence Candidates</div>
-            <div className="space-y-2">
-              <div className="p-3 rounded bg-slate-950 border border-emerald-500/30 text-slate-200 flex justify-between items-start">
-                <div>
-                  <div className="font-bold text-emerald-400 font-mono">[SLACK 2026-01-14 | ID: m_2]</div>
-                  <div className="text-slate-300 mt-1">"UPDATE: Legal audit cleared for Initech Project #1001. Authorized to resume outreach."</div>
-                </div>
-                <span className="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 text-[10px] font-mono font-bold">SELECTED</span>
-              </div>
-
-              <div className="p-3 rounded bg-slate-950 border border-slate-800 text-slate-400 flex justify-between items-start">
-                <div>
-                  <div className="font-bold text-slate-400 font-mono">[NOTE 2026-01-10 | ID: m_1]</div>
-                  <div className="text-slate-400 mt-1">"Hold notice: do not contact Initech regarding Project #1001 due to legal audit."</div>
-                </div>
-                <span className="px-2 py-0.5 rounded bg-amber-500/10 text-amber-400 text-[10px] font-mono font-bold">SUPERSEDED</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Timeline & State Transition */}
-          <div className="space-y-3">
-            <div className="text-xs font-bold text-slate-300 font-mono uppercase">Reconstructed Temporal State</div>
+            <div className="text-xs font-bold text-slate-300 font-mono uppercase">Reconstructed State Timeline</div>
             <div className="p-4 rounded bg-slate-950 border border-slate-800 space-y-3 text-xs font-mono">
               <div className="flex items-center gap-3">
                 <span className="text-slate-500">2026-01-10 ─</span>
@@ -142,22 +120,49 @@ export default function ForensicEvaluationPage() {
               </div>
             </div>
           </div>
+
+          {/* Root Cause Diagnosis */}
+          <div className="space-y-3">
+            <div className="text-xs font-bold text-slate-300 font-mono uppercase">4. ROOT CAUSE DIAGNOSIS</div>
+            <div className="p-4 rounded bg-slate-950 border border-amber-900/40 space-y-2">
+              <div className="font-bold text-amber-400 font-mono">STAGE 3: TEMPORAL RETRIEVAL FAILURE</div>
+              <p className="text-slate-300 text-[11px] leading-relaxed">
+                The Baseline RAG agent selected the earlier 2026-01-10 hold notice note due to high lexical BM25 similarity with "legal hold". Baseline RAG lacked temporal state resolution and failed to recognize that the 2026-01-14 Slack update superseded the earlier hold notice.
+              </p>
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* 4. ROOT CAUSE DIAGNOSIS */}
-      <div className="p-6 rounded-xl bg-[#0d0f17] border border-amber-900/50 space-y-3">
-        <div className="flex items-center justify-between">
-          <div className="text-[10px] text-amber-500 uppercase tracking-widest font-bold">4. ROOT CAUSE DIAGNOSIS</div>
-          <span className="px-2.5 py-0.5 rounded bg-amber-500/10 text-amber-400 border border-amber-500/20 text-xs font-mono font-bold">
-            STAGE 3: TEMPORAL_FAILURE
-          </span>
-        </div>
+      {/* 5. RELEVANT EVIDENCE & PROVENANCE */}
+      <div className="p-6 rounded-xl bg-[#0d0f17] border border-slate-800/80 space-y-4">
+        <div className="text-[10px] text-slate-500 uppercase tracking-widest font-bold">5. RELEVANT EVIDENCE & PROVENANCE TRACE</div>
 
-        <div className="text-sm font-bold text-amber-400">TEMPORAL RETRIEVAL FAILURE ON BASELINE RAG</div>
-        <p className="text-xs text-slate-300 font-sans leading-relaxed">
-          The Baseline RAG agent selected the earlier 2026-01-10 hold notice note due to high lexical BM25 similarity with the query words "legal hold". Baseline RAG lacked temporal state resolution and failed to recognize that the 2026-01-14 Slack update superseded the earlier hold notice.
-        </p>
+        <div className="space-y-2 text-xs font-mono">
+          <div className="p-3 rounded bg-slate-950 border border-emerald-500/30 text-slate-200 flex justify-between items-start">
+            <div>
+              <div className="font-bold text-emerald-400">[SLACK 2026-01-14 | ID: m_2]</div>
+              <div className="text-slate-300 mt-1 font-sans">"UPDATE: Legal audit cleared for Initech Project #1001. You are authorized to resume outreach."</div>
+            </div>
+            <span className="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 text-[10px] font-bold">WINNING EVIDENCE</span>
+          </div>
+
+          <div className="p-3 rounded bg-slate-950 border border-slate-800 text-slate-400 flex justify-between items-start">
+            <div>
+              <div className="font-bold text-slate-400">[NOTE 2026-01-10 | ID: m_1]</div>
+              <div className="text-slate-400 mt-1 font-sans">"Hold notice: do not contact Initech regarding Project #1001 due to legal audit."</div>
+            </div>
+            <span className="px-2 py-0.5 rounded bg-amber-500/10 text-amber-400 text-[10px] font-bold">SUPERSEDED EVIDENCE</span>
+          </div>
+        </div>
+      </div>
+
+      {/* 6. CONTEXT GRAPH TRAVERSAL */}
+      <div className="p-6 rounded-xl bg-[#0d0f17] border border-slate-800/80 space-y-3 font-mono text-xs">
+        <div className="text-[10px] text-slate-500 uppercase tracking-widest font-bold">6. CONTEXT GRAPH TRAVERSAL PATH</div>
+        <div className="p-4 rounded bg-slate-950 border border-slate-800 text-indigo-300 font-mono">
+          Person (p_1: John Smith) ──[OWNS]──&gt; Project (proj_1001: Project #1001) ──[HAS_COMM]──&gt; Slack (m_2: Legal Clearance)
+        </div>
       </div>
     </div>
   );

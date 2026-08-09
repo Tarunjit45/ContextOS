@@ -1,7 +1,4 @@
 {
-  "/evaluations/[id]/page": "app/evaluations/[id]/page.js",
   "/page": "app/page.js",
-  "/architecture/page": "app/architecture/page.js",
-  "/benchmarks/page": "app/benchmarks/page.js",
-  "/failures/page": "app/failures/page.js"
+  "/benchmarks/page": "app/benchmarks/page.js"
 }
