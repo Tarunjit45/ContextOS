@@ -19,30 +19,35 @@ ContextOS/
 │   ├── memory/                 # Memory Ranker & Context Budget Composer
 │   │   ├── memory_ranker.py
 │   │   └── context_composer.py
+│   ├── context/                # Decision-Grade Context Compiler (Phase 3.3)
+│   │   └── context_compiler.py
 │   ├── graph/                  # NetworkX Context Graph Engine
 │   │   └── context_graph.py
-│   ├── agents/                 # Baseline RAG & ContextOS Agent Adapters
-│   ├── evaluation/             # Evaluator Engine & Benchmark Runner
+│   ├── llm/                    # LLM Provider Abstraction (Ollama, OpenAI, OpenRouter, Mock)
+│   │   └── provider.py
+│   ├── agents/                 # Baseline RAG & ContextOS Live Agent Adapters
+│   ├── evaluation/             # Evaluator Engine & Live Benchmark Runner
 │   ├── scenarios/              # Parameterized Synthetic Dataset Generator
 │   └── db/                     # SQLite Local Storage Engine
-├── tests/                      # Pytest Subsystem Test Suite (111 unit tests)
+├── tests/                      # Pytest Subsystem Test Suite (133 unit tests)
 ├── benchmarks/
 │   ├── datasets/v1/            # Frozen Dataset v1 & manifest.json
-│   └── reports/                # Benchmark Run Reports & PHASE_2_2_COMPARISON.md
+│   └── reports/                # Benchmark Run Reports & PHASE_3_2_REAL_LLM_REPORT.md
 └── cli/                        # contextos.py CLI tool
 ```
 
 ## 3. Context Pipeline Architecture
 
-ContextOS implements a multi-stage context retrieval and composition pipeline:
+ContextOS implements a multi-stage decision-grade context compiler pipeline:
 
 1. **Input Sanitization:** Strips ground-truth leakage (`task_category`, `expected_answer`, `expected_action`, `failure_class`).
 2. **Hybrid Retrieval:** Multi-signal score blending lexical BM25, N-gram cosine similarity, entity hits, temporal decay, graph distance, and source authority.
-3. **Entity Resolution:** Canonical entity disambiguation matching names, emails, roles, and departments.
-4. **Temporal State Reconstruction:** Historical event timeline parsing resolving attribute state as of query time.
+3. **Entity Resolution:** Candidate scoring system with suffix matching (`Jr.` vs `Sr.`), role/department attributes, and explicit ambiguity detection.
+4. **Temporal State Reconstruction:** Historical event timeline parsing resolving attribute state as of query time with validity intervals and superseded event tracking.
 5. **Context Graph Traversal:** Bounded NetworkX multi-hop path expansion (`Person -> Project -> Meeting -> Decision`).
-6. **Memory Ranking:** Relevance + Importance > Recency ranking.
-7. **Context Composition:** Structured budget-aware context assembly with conflict precedence rules.
+6. **Conflict Resolution:** Source authority precedence (`CRM > Meeting Note > Email > Slack > Note`) with chronological clearance superseding earlier hold notices.
+7. **Evidence Ranking & Decision-Grade Context Compiler:** Budget-aware deterministic context compilation producing a concise structured format (`[ENTITIES]`, `[CURRENT STATE]`, `[TIMELINE]`, `[RELATIONSHIPS]`, `[EVIDENCE PROVENANCE]`, `[CONFLICT RESOLUTION]`, `[ANSWERABILITY]`, `[CONFIDENCE]`).
+8. **Answerability Classification:** `SUFFICIENT`, `INSUFFICIENT`, `AMBIGUOUS`, or `CONFLICTED` state assignment.
 
 ## 4. Failure Taxonomy
 

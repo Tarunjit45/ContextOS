@@ -1,7 +1,6 @@
 """
-ContextOS Phase 3.1 — Live LLM Agent Adapters
-Supports LiveBaselineRAGAgent, LiveContextOSAgent (Full), and LiveContextOSCompactAgent (Compact).
-Includes full context & token telemetry.
+ContextOS Phase 3.3 — Live LLM Agent Adapters
+Supports LiveBaselineRAGAgent (Control), LiveContextOSAgent (Full Mode), and LiveContextOSCompactAgent (Decision-Grade Context Compiler).
 """
 
 import time
@@ -17,6 +16,7 @@ from packages.retrieval.temporal_resolver import TemporalStateResolver
 from packages.retrieval.entity_resolver import EntityResolver
 from packages.graph.context_graph import ContextGraphEngine
 from packages.memory.context_composer import ContextComposer
+from packages.context.context_compiler import DecisionGradeContextCompiler
 from packages.llm.provider import LLMProvider
 
 SYSTEM_PROMPT_TEMPLATE = (
@@ -29,6 +29,7 @@ def compute_sha256(text: str) -> str:
     return hashlib.sha256(text.encode('utf-8')).hexdigest()
 
 class LiveBaselineRAGAgent:
+    """Control Group: Naive BM25 Retrieval -> Top-3 Evidence -> LLM."""
     def __init__(self, provider: LLMProvider):
         self.provider = provider
 
@@ -40,7 +41,6 @@ class LiveBaselineRAGAgent:
         
         comms = workspace.get("communications", [])
 
-        # Naive BM25 retrieval
         t_ret = time.time()
         scored = []
         for c in comms:
@@ -62,7 +62,6 @@ class LiveBaselineRAGAgent:
         user_hash = compute_sha256(user_prompt)
         ctx_hash = compute_sha256(context_str)
 
-        # LLM Generation
         t_gen = time.time()
         llm_res = self.provider.generate(SYSTEM_PROMPT_TEMPLATE, user_prompt)
         generation_ms = (time.time() - t_gen) * 1000.0
@@ -109,6 +108,7 @@ class LiveBaselineRAGAgent:
         }
 
 class LiveContextOSAgent:
+    """Full Mode: Hybrid Retrieval -> Memory -> Temporal -> Entity -> Graph -> Full Composition -> LLM."""
     def __init__(self, provider: LLMProvider):
         self.provider = provider
         self.retriever = HybridRetriever()
@@ -130,14 +130,14 @@ class LiveContextOSAgent:
         retrieval_ms = (time.time() - t_start_ret) * 1000.0
 
         t_start_comp = time.time()
-        entity_res = self.entity_resolver.resolve_person(query, entities.get("people", []))
+        entity_res = self.entity_resolver.resolve_person(query, entities.get("people", []), retrieved_items)
         temporal_events = self.temporal_resolver.parse_events_from_communications(comms)
         query_date_match = re.search(r'2026-\d{2}-\d{2}', query)
         query_time = (query_date_match.group(0) + " 23:59:59") if query_date_match else "2026-12-31 23:59:59"
         
         reconstructed_state = self.temporal_resolver.resolve_state("comp_hold", "outreach_status", query_time, temporal_events)
         self.graph_engine.build_from_workspace(workspace)
-        start_node = entity_res.get("entity_id") or "p_1"
+        start_node = entity_res.get("canonical_entity_id") or "p_1"
         graph_res = self.graph_engine.traverse_bounded_relationship(start_node=start_node)
         ranked_memory_scores = self.memory_ranker.rank_memories(query, retrieved_items)
 
@@ -161,7 +161,7 @@ class LiveContextOSAgent:
         generation_ms = (time.time() - t_gen) * 1000.0
         total_ms = (time.time() - t0) * 1000.0
 
-        top_ids = [item["evidence_id"] for item in retrieved_items[:3]]
+        top_ids = [item.get("evidence_id") or item.get("id") for item in retrieved_items[:3]]
 
         return {
             "agent_type": "Live ContextOS Full",
@@ -195,18 +195,15 @@ class LiveContextOSAgent:
         }
 
 class LiveContextOSCompactAgent:
-    """
-    Live ContextOS Compact Agent using high-priority evidence filtering
-    for low-resource context optimization.
-    """
-    def __init__(self, provider: LLMProvider):
+    """Decision-Grade Context Compiler Agent."""
+    def __init__(self, provider: LLMProvider, token_budget: int = 2048):
         self.provider = provider
         self.retriever = HybridRetriever()
         self.memory_ranker = MemoryRanker()
         self.temporal_resolver = TemporalStateResolver()
         self.entity_resolver = EntityResolver()
         self.graph_engine = ContextGraphEngine(max_depth=3)
-        self.context_composer = ContextComposer(token_budget=2000)
+        self.context_compiler = DecisionGradeContextCompiler(default_token_budget=token_budget)
 
     async def run(self, task: Dict[str, Any], workspace: Dict[str, Any]) -> Dict[str, Any]:
         assert_no_ground_truth_leakage(task)
@@ -220,26 +217,28 @@ class LiveContextOSCompactAgent:
         retrieval_ms = (time.time() - t_start_ret) * 1000.0
 
         t_start_comp = time.time()
-        entity_res = self.entity_resolver.resolve_person(query, entities.get("people", []))
+        entity_res = self.entity_resolver.resolve_person(query, entities.get("people", []), retrieved_items)
         temporal_events = self.temporal_resolver.parse_events_from_communications(comms)
         query_date_match = re.search(r'2026-\d{2}-\d{2}', query)
         query_time = (query_date_match.group(0) + " 23:59:59") if query_date_match else "2026-12-31 23:59:59"
         
         reconstructed_state = self.temporal_resolver.resolve_state("comp_hold", "outreach_status", query_time, temporal_events)
         self.graph_engine.build_from_workspace(workspace)
-        start_node = entity_res.get("entity_id") or "p_1"
+        start_node = entity_res.get("canonical_entity_id") or "p_1"
         graph_res = self.graph_engine.traverse_bounded_relationship(start_node=start_node)
-        ranked_memory_scores = self.memory_ranker.rank_memories(query, retrieved_items)
 
-        composed_context = self.context_composer.compose_compact(
-            retrieved_items=retrieved_items,
+        compiled_res = self.context_compiler.compile(
+            query=query,
+            retrieved_evidence=retrieved_items,
             entities=entities,
+            resolved_entity=entity_res,
             reconstructed_state=reconstructed_state,
-            graph_trace=graph_res.get("trace", [])
+            graph_trace=graph_res.get("trace", []),
+            token_budget=self.context_compiler.default_token_budget
         )
         context_composition_ms = (time.time() - t_start_comp) * 1000.0
 
-        context_str = json.dumps(composed_context, indent=2)
+        context_str = compiled_res["compiled_context_text"]
         user_prompt = f"CONTEXT:\n{context_str}\n\nQUESTION:\n{query}"
 
         sys_hash = compute_sha256(SYSTEM_PROMPT_TEMPLATE)
@@ -251,14 +250,15 @@ class LiveContextOSCompactAgent:
         generation_ms = (time.time() - t_gen) * 1000.0
         total_ms = (time.time() - t0) * 1000.0
 
-        selected_ids = composed_context.get("selected_evidence_ids", [])
+        selected_ids = compiled_res.get("selected_evidence_ids", [])
 
         return {
             "agent_type": "Live ContextOS Compact",
             "context_mode": "compact",
             "response": llm_res.get("text", ""),
             "decision": None,
-            "confidence": 0.0,
+            "confidence": compiled_res.get("confidence", 0.0),
+            "answerability": compiled_res.get("answerability", "SUFFICIENT"),
             "retrieved_evidence": selected_ids,
             "selected_evidence_ids": selected_ids,
             "rejected_evidence_ids": [],
@@ -275,7 +275,7 @@ class LiveContextOSCompactAgent:
             "cost_usd": llm_res.get("cost_usd"),
             "status": llm_res.get("status", "SUCCESS"),
             "error_message": llm_res.get("error_message"),
-            "telemetry": composed_context.get("telemetry", {}),
+            "telemetry": compiled_res.get("telemetry", {}),
             "latency": {
                 "retrieval_ms": round(retrieval_ms, 2),
                 "context_composition_ms": round(context_composition_ms, 2),
