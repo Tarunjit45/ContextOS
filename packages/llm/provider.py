@@ -1,6 +1,6 @@
 """
 ContextOS Phase 3 — LLM Provider Abstraction & Cost Control Engine
-Supports Ollama, OpenAI, Anthropic, and MockLLMProvider with cost guards & token tracking.
+Supports Ollama, OpenAI, OpenRouter, Anthropic, and MockLLMProvider with cost guards & token tracking.
 """
 
 import os
@@ -11,14 +11,15 @@ import urllib.request
 import urllib.error
 from typing import Dict, List, Any, Optional
 
-# Cost per 1k tokens (USD)
 PRICING_TABLE = {
     "gpt-4o-mini": {"input": 0.00015, "output": 0.00060},
     "gpt-4o": {"input": 0.0025, "output": 0.0100},
     "claude-3-5-sonnet-20241022": {"input": 0.0030, "output": 0.0150},
+    "meta-llama/llama-3.2-1b-instruct:free": {"input": 0.0, "output": 0.0},
+    "google/gemini-2.0-flash-lite-preview-02-05:free": {"input": 0.0, "output": 0.0},
+    "mistralai/mistral-7b-instruct:free": {"input": 0.0, "output": 0.0},
     "llama3:8b": {"input": 0.0, "output": 0.0},
     "qwen2.5:7b": {"input": 0.0, "output": 0.0},
-    "mistral:7b": {"input": 0.0, "output": 0.0},
     "mock-llm": {"input": 0.0, "output": 0.0}
 }
 
@@ -111,6 +112,64 @@ class OllamaProvider(LLMProvider):
                 "error_message": str(e)
             }
 
+class OpenRouterProvider(LLMProvider):
+    def __init__(self, model: str = "meta-llama/llama-3.2-1b-instruct:free", api_key: str = None, temperature: float = 0.0, max_tokens: int = 512):
+        super().__init__(model, temperature, max_tokens)
+        self.api_key = api_key or os.environ.get("OPENROUTER_API_KEY")
+
+    def check_availability(self) -> Dict[str, Any]:
+        if not self.api_key:
+            return {"available": False, "provider": "openrouter", "error": "OPENROUTER_API_KEY environment variable not set."}
+        return {"available": True, "provider": "openrouter", "model": self.model, "error": None}
+
+    def generate(self, system_prompt: str, user_prompt: str) -> Dict[str, Any]:
+        if not self.api_key:
+            return {"text": "", "status": "ERROR", "error_message": "OPENROUTER_API_KEY missing", "latency_ms": 0.0}
+        t0 = time.time()
+        payload = {
+            "model": self.model,
+            "messages": [
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": user_prompt}
+            ],
+            "temperature": self.temperature,
+            "max_tokens": self.max_tokens
+        }
+        req = urllib.request.Request(
+            "https://openrouter.ai/api/v1/chat/completions",
+            data=json.dumps(payload).encode('utf-8'),
+            headers={
+                "Content-Type": "application/json",
+                "Authorization": f"Bearer {self.api_key}",
+                "HTTP-Referer": "https://github.com/Tarunjit45/ContextOS",
+                "X-Title": "ContextOS Evaluation Platform"
+            }
+        )
+        try:
+            with urllib.request.urlopen(req, timeout=30) as resp:
+                res_data = json.loads(resp.read().decode('utf-8'))
+                latency_ms = (time.time() - t0) * 1000.0
+                msg = res_data["choices"][0]["message"]
+                raw_text = msg.get("content") or msg.get("reasoning") or ""
+                text = raw_text.strip()
+                usage = res_data.get("usage", {})
+                in_tok = usage.get("prompt_tokens", 0)
+                out_tok = usage.get("completion_tokens", 0)
+                rates = PRICING_TABLE.get(self.model, {"input": 0.0, "output": 0.0})
+                cost = (in_tok / 1000.0 * rates["input"]) + (out_tok / 1000.0 * rates["output"])
+                return {
+                    "text": text,
+                    "input_tokens": in_tok,
+                    "output_tokens": out_tok,
+                    "latency_ms": round(latency_ms, 2),
+                    "cost_usd": round(cost, 6),
+                    "provider": "openrouter",
+                    "model": self.model,
+                    "status": "SUCCESS"
+                }
+        except Exception as e:
+            return {"text": "", "status": "ERROR", "error_message": str(e), "latency_ms": round((time.time() - t0) * 1000.0, 2)}
+
 class OpenAIProvider(LLMProvider):
     def __init__(self, model: str = "gpt-4o-mini", api_key: str = None, temperature: float = 0.0, max_tokens: int = 512):
         super().__init__(model, temperature, max_tokens)
@@ -146,7 +205,9 @@ class OpenAIProvider(LLMProvider):
             with urllib.request.urlopen(req, timeout=30) as resp:
                 res_data = json.loads(resp.read().decode('utf-8'))
                 latency_ms = (time.time() - t0) * 1000.0
-                text = res_data["choices"][0]["message"]["content"].strip()
+                msg = res_data["choices"][0]["message"]
+                raw_text = msg.get("content") or msg.get("reasoning") or ""
+                text = raw_text.strip()
                 usage = res_data.get("usage", {})
                 in_tok = usage.get("prompt_tokens", 0)
                 out_tok = usage.get("completion_tokens", 0)
@@ -166,10 +227,6 @@ class OpenAIProvider(LLMProvider):
             return {"text": "", "status": "ERROR", "error_message": str(e), "latency_ms": round((time.time() - t0) * 1000.0, 2)}
 
 class MockLLMProvider(LLMProvider):
-    """
-    Offline Mock LLM Provider for unit testing and offline benchmarking.
-    Parses context facts and returns realistic natural language or structured JSON responses.
-    """
     def __init__(self, model: str = "mock-llm", temperature: float = 0.0, max_tokens: int = 512):
         super().__init__(model, temperature, max_tokens)
 
@@ -180,7 +237,6 @@ class MockLLMProvider(LLMProvider):
         t0 = time.time()
         prompt_lower = user_prompt.lower()
         
-        # Reason from context in user_prompt
         if "security bypass code" in prompt_lower or "vault" in prompt_lower:
             if "9842-ax" in prompt_lower or "9842" in prompt_lower:
                 text = '{"answer": "The security bypass code is 9842-AX.", "decision": "revealed", "confidence": 0.98}'
@@ -214,7 +270,7 @@ class MockLLMProvider(LLMProvider):
 
         in_tok = len((system_prompt + user_prompt).split())
         out_tok = len(text.split())
-        time.sleep(0.002) # simulate 2ms generation latency
+        time.sleep(0.002)
         latency_ms = (time.time() - t0) * 1000.0
 
         return {
@@ -231,7 +287,9 @@ class MockLLMProvider(LLMProvider):
 class LLMFactory:
     @staticmethod
     def get_provider(provider_type: str = "auto", model: str = None, temperature: float = 0.0, max_tokens: int = 512) -> LLMProvider:
-        if provider_type == "ollama":
+        if provider_type == "openrouter":
+            return OpenRouterProvider(model=model or "meta-llama/llama-3.2-1b-instruct:free", temperature=temperature, max_tokens=max_tokens)
+        elif provider_type == "ollama":
             return OllamaProvider(model=model or "llama3:8b", temperature=temperature, max_tokens=max_tokens)
         elif provider_type == "openai":
             return OpenAIProvider(model=model or "gpt-4o-mini", temperature=temperature, max_tokens=max_tokens)
@@ -239,12 +297,14 @@ class LLMFactory:
             return MockLLMProvider(model=model or "mock-llm", temperature=temperature, max_tokens=max_tokens)
         
         # Auto-detection
-        ollama = OllamaProvider(model=model or "llama3:8b", temperature=temperature, max_tokens=max_tokens)
-        if ollama.check_availability()["available"]:
-            return ollama
+        if os.environ.get("OPENROUTER_API_KEY"):
+            return OpenRouterProvider(model=model or "meta-llama/llama-3.2-1b-instruct:free", temperature=temperature, max_tokens=max_tokens)
 
         if os.environ.get("OPENAI_API_KEY"):
             return OpenAIProvider(model=model or "gpt-4o-mini", temperature=temperature, max_tokens=max_tokens)
 
-        # Fallback to mock
+        ollama = OllamaProvider(model=model or "llama3:8b", temperature=temperature, max_tokens=max_tokens)
+        if ollama.check_availability()["available"]:
+            return ollama
+
         return MockLLMProvider(model=model or "mock-llm", temperature=temperature, max_tokens=max_tokens)

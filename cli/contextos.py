@@ -55,7 +55,7 @@ def main():
     live_p = bench_sub.add_parser("live", help="Run Phase 3.1 live LLM benchmark suite")
     live_p.add_argument("--scenarios", type=int, default=10, help="Scenario count (default 10 for low-resource smoke test)")
     live_p.add_argument("--seed", type=int, default=42, help="Random seed (default 42)")
-    live_p.add_argument("--provider", type=str, default="auto", choices=["auto", "ollama", "openai", "mock"], help="LLM provider (default auto)")
+    live_p.add_argument("--provider", type=str, default="auto", choices=["auto", "openrouter", "ollama", "openai", "mock"], help="LLM provider (default auto)")
     live_p.add_argument("--model", type=str, default=None, help="LLM model name")
     live_p.add_argument("--context-mode", type=str, default="three_way", choices=["full", "compact", "three_way"], help="ContextOS composition mode")
 

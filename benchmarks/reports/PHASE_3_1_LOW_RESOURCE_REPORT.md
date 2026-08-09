@@ -1,10 +1,10 @@
 # 🔬 ContextOS Phase 3.1 — Low-Resource Real LLM Evaluation Report
 
-**Execution Timestamp:** `2026-08-09T23:35:01.165260`  
+**Execution Timestamp:** `2026-08-10T00:08:45.639903`  
 **Experiment Mode:** `REAL_LLM_LOCAL_LOW_RESOURCE`  
 **Dataset v1 Hash Status:** `VERIFIED ✓ (SHA256: 2ba2719180060804d7a6fdaf0fd132e27ccb1e78f0a54ec8adff6855f57b12fa)`  
-**Provider:** `mock` | **Model:** `mock-llm` | **Temperature:** `0.0`  
-**Hardware:** 12 CPU Cores | 5.85 GB RAM Total (0.33 GB Available) | GPU: None (CPU Only)  
+**Provider:** `openrouter` | **Model:** `openrouter/free` | **Temperature:** `0.0`  
+**Hardware:** 12 CPU Cores | 5.85 GB RAM Total (0.31 GB Available) | GPU: None (CPU Only)  
 
 > [!IMPORTANT]
 > **Statistical Disclaimer:** `n=10` is a smoke test and is NOT statistically sufficient to establish general performance superiority.
@@ -13,10 +13,10 @@
 
 | Metric | Live Baseline RAG | Live ContextOS (Full) | Live ContextOS (Compact) | Delta (Full vs Baseline) |
 |---|---|---|---|---|
-| **Overall Accuracy** | 50.0% | 70.0% | 70.0% | +20.0% |
-| **Hallucination Rate** | 0.0% | 0.0% | 0.0% | +0.0% |
-| **P50 Latency** | 6.09 ms | 116.01 ms | 112.35 ms | +109.92 ms |
-| **Total Input Tokens** | 1019 | 12563 | 1398 | +11544 |
+| **Overall Accuracy** | 50.0% | 50.0% | 90.0% | +0.0% |
+| **Hallucination Rate** | 10.0% | 0.0% | 0.0% | -10.0% |
+| **P50 Latency** | 4960.82 ms | 4633.7 ms | 6701.65 ms | -327.12 ms |
+| **Total Input Tokens** | 2441 | 65424 | 4204 | +62983 |
 | **Total Cost** | $0.0000 | $0.0000 | $0.0000 | N/A |
 
 ## 2. Experimental Validity Assessment
