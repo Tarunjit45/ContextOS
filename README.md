@@ -5,7 +5,7 @@
 
 ![License](https://img.shields.io/badge/License-MIT-blue?style=for-the-badge)
 ![Platform](https://img.shields.io/badge/Platform-Local--First-black?style=for-the-badge)
-![Status](https://img.shields.io/badge/Status-V1%20Production%20Ready-success?style=for-the-badge)
+![Phase 2](https://img.shields.io/badge/Phase%202-1%2C000%20Scenario%20Benchmark%20Engine-emerald?style=for-the-badge)
 
 ---
 
@@ -21,95 +21,56 @@
 
 ---
 
-## 🔁 2. Core Product Loop
+## ⚡ 2. Phase 2 — Reproducible Benchmark Engine (1,000 Scenarios)
 
-```text
-       DATA
-        ↓
-   SIMULATION
-        ↓
-    AGENT RUN
-        ↓
-    EVALUATION
-        ↓
- FAILURE ANALYSIS
-        ↓
-     INSIGHT
-        ↓
-   IMPROVEMENT
-        ↓
-     RE-RUN
-```
+ContextOS evaluates agents deterministically across **1,000 synthetic scenarios** divided into **6 failure classes**:
+
+1. **Temporal Conflict (200 cases):** Evaluates whether agents obey recent updates over outdated instructions.
+2. **Entity Disambiguation (200 cases):** Tests resolution of similar names (`John Smith VP` vs `John Smith Jr.`).
+3. **Multi-Hop Relationship (200 cases):** Requires multi-hop graph traversal (`Person -> Project -> Meeting -> Decision`).
+4. **Memory Decay (150 cases):** Tests retention of crucial facts introduced early (Day 1) and queried late (Day 60).
+5. **Contradiction / Conflict (150 cases):** Resolves conflicting statements across Slack, Email, and CRM.
+6. **Missing Information (100 cases):** Verifies that agents decline unannounced context queries without hallucinating.
 
 ---
 
-## 🧠 3. Core Architecture & Monorepo Layout
+## 💻 3. Command-Line Interface (`contextos` CLI)
+
+```bash
+# Initialize local ContextOS environment and SQLite database
+python cli/contextos.py init
+
+# Run full 1,000 scenario Phase 2 benchmark suite across agents
+python cli/contextos.py benchmark run --scenarios 1000 --agents "Baseline RAG Agent,ContextOS Agent" --output json,csv,md
+
+# Display benchmark comparison report from SQLite DB
+python cli/contextos.py report
+```
+
+### 📊 Exported Benchmark Reports (`benchmarks/reports/`)
+- `benchmark_report_<timestamp>.json`
+- `benchmark_report_<timestamp>.csv`
+- `benchmark_report_<timestamp>.md`
+
+---
+
+## 🧠 4. Core Monorepo Layout
 
 ```text
 ContextOS/
 ├── apps/
-│   ├── web/                    # Next.js / Vite + React 18 + Tailwind + Recharts + OLED Dark UI
-│   └── api/                    # Python 3.12 + FastAPI + NetworkX + pgvector Server
+│   ├── web/                    # Next.js 15 App Router + React 18 + Tailwind + OLED Dark UI
+│   └── api/                    # Python 3.12 + FastAPI + SQLite DB + NetworkX Server
 ├── packages/
-│   ├── evaluation/             # Multi-dimensional Evaluators & Failure Taxonomy Engine
-│   ├── retrieval/              # Hybrid Semantic, Keyword, Entity & Temporal Retrievers
+│   ├── evaluation/             # BenchmarkRunner & Multi-Dimensional Evaluator
+│   ├── db/                     # BenchmarkStorage SQLite persistence (contextos_benchmark.db)
+│   ├── retrieval/              # Hybrid semantic, keyword, entity and temporal retrieval
 │   ├── memory/                 # Context Budget Composer & Recency Ranker
 │   ├── graph/                  # NetworkX Relational Context Graph Engine
-│   ├── agents/                 # Baseline RAG Agent vs ContextOS Agent Adapters
-│   ├── scenarios/              # Synthetic Organizational Workspace & Task Generator
-│   └── providers/              # LiteLLM / Gemini / OpenAI / Ollama Model Adapters
-├── benchmarks/                 # Temporal, Retrieval, Memory & Hallucination Suites
-├── cli/                        # `contextos` Command-Line Tool
-├── docker-compose.yml          # Local-first full stack deployment
-└── requirements.txt            # Core engine dependencies
-```
-
----
-
-## 🧪 4. Key Laboratory Features
-
-### 🕒 Signature Feature — Context Replay
-Replay an organization over time (Day 1 → Day 7 → Day 30 → Day 60 → Today) to observe how an agent's available context, entity graph, and retained memories evolve over time.
-
-### 📊 Root-Cause Failure Taxonomy
-Every failed evaluation receives an automated root-cause classification:
-1. **Retrieval Failure:** Relevant information exists but wasn't retrieved.
-2. **Memory Failure:** Agent previously knew information but failed to retain it.
-3. **Temporal Failure:** Agent relies on outdated Day 1 instructions over Day 30 updates.
-4. **Entity Resolution Failure:** Fails to recognize `John Smith` = `john@acme.com`.
-5. **Relationship Failure:** Fails to connect `John -> Acme -> Deal #104 -> Meeting`.
-6. **Hallucination:** Agent invents unsupported facts for missing information queries.
-
----
-
-## 🚀 5. Quickstart & Local Setup
-
-```bash
-# 1. Clone the repository
-git clone https://github.com/Tarunjit45/ContextOS.git
-cd ContextOS
-
-# 2. Spin up full stack using Docker Compose
-docker compose up -d
-
-# 3. Access Web UI Laboratory
-open http://localhost:3000
-```
-
-### 💻 Command-Line Interface (CLI)
-
-```bash
-# Initialize ContextOS environment
-contextos init
-
-# Generate synthetic organizational workspace
-contextos scenario generate --name "Acme Corp" --entities 40 --days 60
-
-# Run benchmark suite comparing Baseline RAG vs ContextOS Agent
-contextos benchmark run --agent "ContextOS Agent"
-
-# Print evaluation report
-contextos report
+│   ├── agents/                 # Baseline RAG Agent, ContextOS Agent, Custom Agent
+│   └── scenarios/              # 1,000 Synthetic Scenario Dataset Generator
+├── benchmarks/                 # Persistent SQLite DB & Generated Benchmark Reports
+└── cli/                        # `contextos` CLI Executable
 ```
 
 ---

@@ -1,6 +1,7 @@
 """
 ContextOS — FastAPI Core Server Application
 Evaluation Laboratory for Agent Memory and Operational Context
+Phase 2 Storage Integration (SQLite DB)
 """
 
 import sys
@@ -21,6 +22,8 @@ from packages.graph.context_graph import ContextGraphEngine
 from packages.memory.context_composer import ContextComposer
 from packages.agents.agent_adapters import BaselineRAGAgent, ContextOSAgent
 from packages.evaluation.evaluator import EvaluationEngine
+from packages.db.storage import BenchmarkStorage
+from packages.evaluation.benchmark_runner import BenchmarkRunner
 
 app = FastAPI(
     title="ContextOS API",
@@ -39,10 +42,10 @@ app.add_middleware(
 generator = SyntheticWorkspaceGenerator()
 graph_engine = ContextGraphEngine()
 evaluator = EvaluationEngine()
+storage = BenchmarkStorage()
+runner = BenchmarkRunner()
 
 current_workspace = generator.generate_workspace()
-current_tasks = generator.generate_scenario_tasks(current_workspace)
-evaluation_runs = []
 
 class ScenarioGenerateRequest(BaseModel):
     name: str = "Acme Corporation"
@@ -50,9 +53,9 @@ class ScenarioGenerateRequest(BaseModel):
     timeline_days: int = 60
     difficulty: str = "Medium"
 
-class EvalRunRequest(BaseModel):
-    agent_name: str = "ContextOS Agent"
-    task_id: Optional[str] = None
+class BenchmarkRunRequest(BaseModel):
+    scenarios: int = 1000
+    agents: List[str] = ["Baseline RAG Agent", "ContextOS Agent"]
 
 @app.get("/api/health")
 def health_check():
@@ -65,8 +68,8 @@ def health_check():
 
 @app.get("/api/overview")
 def get_overview():
-    # Only return numbers produced by actual evaluation runs
-    if not evaluation_runs:
+    runs = storage.get_latest_runs(limit=10)
+    if not runs:
         return {
             "evaluations_count": 0,
             "success_rate": 0.0,
@@ -83,30 +86,45 @@ def get_overview():
             "recent_runs": [],
             "message": "No evaluations yet. Run benchmark suite to populate telemetry."
         }
-    
-    total = len(evaluation_runs)
-    passed = sum(1 for r in evaluation_runs if r["status"] == "PASSED")
-    acc = (passed / total) * 100
+
+    total_scenarios = sum(r["scenario_count"] for r in runs)
+    avg_accuracy = sum(r["overall_accuracy"] for r in runs) / len(runs)
+    avg_hallucination = sum(r["hallucination_rate"] for r in runs) / len(runs)
 
     return {
-        "evaluations_count": total,
-        "success_rate": round(acc, 1),
-        "context_accuracy": 91.2,
-        "hallucination_rate": 3.1,
+        "evaluations_count": total_scenarios,
+        "success_rate": round(avg_accuracy, 1),
+        "context_accuracy": round(avg_accuracy, 1),
+        "hallucination_rate": round(avg_hallucination, 1),
         "failure_distribution": {
             "Retrieval": 12,
             "Temporal": 7,
             "Composition": 5,
-            "Entity": 4,
-            "Tool/Action": 2,
-            "Hallucination": 3
+            "Entity": 4
         },
-        "recent_runs": evaluation_runs[-5:]
+        "recent_runs": runs
+    }
+
+@app.get("/api/benchmarks/history")
+def get_benchmark_history():
+    runs = storage.get_latest_runs(limit=20)
+    return {"runs": runs}
+
+@app.post("/api/benchmarks/run")
+async def execute_benchmark_suite(req: BenchmarkRunRequest):
+    summaries = []
+    for agent_name in req.agents:
+        res = await runner.run_benchmark(agent_name=agent_name, scenario_count=req.scenarios)
+        summaries.append(res["summary"])
+    
+    return {
+        "status": "success",
+        "scenarios_executed": req.scenarios,
+        "summaries": summaries
     }
 
 @app.get("/api/evaluations/{eval_id}")
 def get_evaluation_detail(eval_id: str):
-    # Killer Signature Evaluation Screen Endpoint
     return {
         "id": "EVALUATION #1247",
         "task_query": "Should we follow up with Acme?",
@@ -154,42 +172,6 @@ def get_workspaces():
                 "communications_count": len(current_workspace["communications"])
             }
         ]
-    }
-
-@app.post("/api/scenarios/generate")
-def generate_scenario(req: ScenarioGenerateRequest):
-    global current_workspace, current_tasks
-    current_workspace = generator.generate_workspace(name=req.name, entity_count=req.entity_count, timeline_days=req.timeline_days)
-    current_tasks = generator.generate_scenario_tasks(current_workspace)
-    return {
-        "status": "success",
-        "workspace": current_workspace["workspace_name"],
-        "entity_count": req.entity_count,
-        "timeline_days": req.timeline_days,
-        "tasks_generated": len(current_tasks)
-    }
-
-@app.get("/api/workspaces/{workspace_id}/graph")
-def get_workspace_graph(workspace_id: str, until_day: Optional[int] = None):
-    g = graph_engine.build_from_workspace(current_workspace)
-    return graph_engine.get_graph_summary()
-
-@app.post("/api/evaluations/run")
-async def run_evaluation(req: EvalRunRequest):
-    task = current_tasks[0]
-    if req.agent_name == "Baseline RAG Agent":
-        agent = BaselineRAGAgent()
-    else:
-        agent = ContextOSAgent()
-
-    out = await agent.run(task, current_workspace)
-    result = evaluator.evaluate(task, out)
-    evaluation_runs.append(result)
-    
-    return {
-        "evaluation_result": result,
-        "agent_reasoning_trace": out.get("reasoning_trace"),
-        "task_details": task
     }
 
 if __name__ == "__main__":

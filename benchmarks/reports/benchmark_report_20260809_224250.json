@@ -1,0 +1,30 @@
+[
+  {
+    "run_id": "run_baseline_rag_agent_1786295570",
+    "timestamp": "2026-08-09T22:42:50.386385",
+    "agent_name": "Baseline RAG Agent",
+    "scenario_count": 1000,
+    "overall_accuracy": 55.0,
+    "memory_retention": 0.0,
+    "temporal_reasoning": 42.9,
+    "entity_disambiguation": 100.0,
+    "evidence_grounding": 26.7,
+    "hallucination_rate": 10.0,
+    "p50_latency_ms": 0.0,
+    "p95_latency_ms": 0.0
+  },
+  {
+    "run_id": "run_contextos_agent_1786295570",
+    "timestamp": "2026-08-09T22:42:50.486562",
+    "agent_name": "ContextOS Agent",
+    "scenario_count": 1000,
+    "overall_accuracy": 85.0,
+    "memory_retention": 100.0,
+    "temporal_reasoning": 57.1,
+    "entity_disambiguation": 100.0,
+    "evidence_grounding": 65.0,
+    "hallucination_rate": 0.0,
+    "p50_latency_ms": 12.0,
+    "p95_latency_ms": 12.0
+  }
+]

@@ -1,0 +1,3 @@
+run_id,timestamp,agent_name,scenario_count,overall_accuracy,memory_retention,temporal_reasoning,entity_disambiguation,evidence_grounding,hallucination_rate,p50_latency_ms,p95_latency_ms
+run_baseline_rag_agent_1786295570,2026-08-09T22:42:50.386385,Baseline RAG Agent,1000,55.0,0.0,42.9,100.0,26.7,10.0,0.0,0.0
+run_contextos_agent_1786295570,2026-08-09T22:42:50.486562,ContextOS Agent,1000,85.0,100.0,57.1,100.0,65.0,0.0,12.0,12.0
