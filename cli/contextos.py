@@ -1,9 +1,9 @@
 """
-ContextOS CLI Tool — Phase 2 & Phase 3 Commands
+ContextOS CLI Tool — Phase 2 & Phase 3.1 Commands
 Usage:
-  python cli/contextos.py llm check
+  python cli/contextos.py llm check [--model <model-name>]
   python cli/contextos.py benchmark run --scenarios 1000 --seed 42
-  python cli/contextos.py benchmark live --scenarios 100 --seed 42 --provider mock
+  python cli/contextos.py benchmark live --scenarios 10 --seed 42 --provider ollama --model <model-name>
   python cli/contextos.py benchmark live-report
   python cli/contextos.py benchmark live-trace --run-id <RUN_ID>
   python cli/contextos.py benchmark validate-dataset
@@ -23,6 +23,7 @@ from packages.scenarios.generator import SyntheticWorkspaceGenerator
 from packages.evaluation.benchmark_runner import BenchmarkRunner, verify_dataset_v1_manifest
 from packages.llm.provider import LLMFactory
 from packages.evaluation.live_runner import LiveBenchmarkRunner
+from packages.utils.hardware import detect_hardware, assess_model_resource_fit
 from packages.db.storage import BenchmarkStorage
 
 def main():
@@ -32,7 +33,8 @@ def main():
     # --- 1. LLM Command Group ---
     llm_parser = subparsers.add_parser("llm", help="Manage LLM Providers & Health Checks")
     llm_sub = llm_parser.add_subparsers(dest="subcommand", help="LLM Subcommands")
-    llm_sub.add_parser("check", help="Check LLM provider availability, models, and cost limit")
+    llm_check = llm_sub.add_parser("check", help="Check LLM provider availability, hardware memory fit, and cost limit")
+    llm_check.add_argument("--model", type=str, default="llama3:8b", help="Model to assess for RAM/VRAM fit")
 
     # --- 2. Benchmark Command Group ---
     bench_parser = subparsers.add_parser("benchmark", help="Benchmark Engine Operations")
@@ -49,15 +51,16 @@ def main():
     val_p.add_argument("--scenarios", type=int, default=1000, help="Scenario count (default 1000)")
     val_p.add_argument("--seed", type=int, default=42, help="Random seed (default 42)")
 
-    # Live LLM Benchmark Run (Phase 3)
-    live_p = bench_sub.add_parser("live", help="Run Phase 3 live LLM benchmark suite")
-    live_p.add_argument("--scenarios", type=int, default=100, help="Scenario count (default 100)")
+    # Live LLM Benchmark Run (Phase 3.1)
+    live_p = bench_sub.add_parser("live", help="Run Phase 3.1 live LLM benchmark suite")
+    live_p.add_argument("--scenarios", type=int, default=10, help="Scenario count (default 10 for low-resource smoke test)")
     live_p.add_argument("--seed", type=int, default=42, help="Random seed (default 42)")
     live_p.add_argument("--provider", type=str, default="auto", choices=["auto", "ollama", "openai", "mock"], help="LLM provider (default auto)")
     live_p.add_argument("--model", type=str, default=None, help="LLM model name")
+    live_p.add_argument("--context-mode", type=str, default="three_way", choices=["full", "compact", "three_way"], help="ContextOS composition mode")
 
     # Live Report & Live Trace
-    bench_sub.add_parser("live-report", help="Display Phase 3 LLM benchmark summary report")
+    bench_sub.add_parser("live-report", help="Display Phase 3.1 LLM benchmark summary report")
     trace_p = bench_sub.add_parser("live-trace", help="View raw LLM execution trace by Run ID")
     trace_p.add_argument("--run-id", type=str, required=True, help="Live run ID")
 
@@ -68,11 +71,29 @@ def main():
     args = parser.parse_args()
 
     if args.command == "llm" and args.subcommand == "check":
-        print("\nChecking ContextOS LLM Provider Environments...")
+        print("\nChecking ContextOS Hardware & LLM Provider Environments...")
         print("=" * 75)
         
+        hw = detect_hardware()
+        print(f"|-- Hardware Profile:")
+        print(f"|   |-- OS:              {hw['os']}")
+        print(f"|   |-- CPU Cores:       {hw['cpu_cores']}")
+        print(f"|   |-- Total RAM:       {hw['total_ram_gb']} GB")
+        print(f"|   |-- Available RAM:   {hw['available_ram_gb']} GB")
+        print(f"|   +-- GPU:             {hw['gpu_name'] or 'None (CPU Only)'}")
+
+        model_name = getattr(args, "model", "llama3:8b")
+        fit = assess_model_resource_fit(model_name, hw)
+        print(f"|-- Model Assessment ('{model_name}'):")
+        print(f"|   |-- Est. Parameters: ~{fit['estimated_params_b']}B")
+        print(f"|   |-- Est. RAM Needed: ~{fit['estimated_ram_required_gb']} GB")
+        print(f"|   |-- Memory Fit:      {'YES [OK]' if fit['is_fit'] else 'NO [LOW RAM RISK]'}")
+        if fit['warning_message']:
+            print(f"|   |-- Warning:         {fit['warning_message']}")
+        print(f"|   +-- Recommendation:  {fit['recommended_action']}")
+
         factory = LLMFactory()
-        ollama = factory.get_provider("ollama")
+        ollama = factory.get_provider("ollama", model=model_name)
         ollama_status = ollama.check_availability()
         
         openai = factory.get_provider("openai")
@@ -83,14 +104,10 @@ def main():
 
         max_cost = os.environ.get("CONTEXTOS_MAX_COST_USD", "5.00")
 
-        print(f"|-- Provider: Ollama (http://localhost:11434)")
-        print(f"|   |-- Available:   {'YES [OK]' if ollama_status['available'] else 'NO [OFFLINE]'}")
-        print(f"|   +-- Error:       {ollama_status.get('error') or 'None'}")
-        print(f"|-- Provider: OpenAI API")
-        print(f"|   |-- Available:   {'YES [OK]' if openai_status['available'] else 'NO [KEY MISSING]'}")
-        print(f"|   +-- Error:       {openai_status.get('error') or 'None'}")
-        print(f"|-- Provider: Offline Mock LLM")
-        print(f"|   +-- Available:   YES [OK] (Always ready)")
+        print(f"|-- LLM Provider Status:")
+        print(f"|   |-- Ollama:          {'YES [OK]' if ollama_status['available'] else 'NO [OFFLINE]'}")
+        print(f"|   |-- OpenAI:          {'YES [OK]' if openai_status['available'] else 'NO [KEY MISSING]'}")
+        print(f"|   +-- Offline Mock:    YES [OK] (Always ready)")
         print(f"+-- Cost Guard:     CONTEXTOS_MAX_COST_USD = ${max_cost}")
         print("=" * 75 + "\n")
 
@@ -148,14 +165,14 @@ def main():
         print("=" * 75 + "\n")
 
     elif args.command == "benchmark" and args.subcommand == "live":
-        print(f"\nRunning ContextOS Phase 3 Live LLM Benchmark Suite ({args.scenarios} Scenarios | Provider: {args.provider})...")
+        print(f"\nRunning ContextOS Phase 3.1 Live LLM Benchmark Suite ({args.scenarios} Scenarios | Provider: {args.provider})...")
         print("=" * 75)
         
         provider_obj = LLMFactory.get_provider(args.provider, model=args.model)
         live_runner = LiveBenchmarkRunner(provider=provider_obj, seed=args.seed)
 
         async def _run_live():
-            res = await live_runner.run_live_benchmark(scenarios_count=args.scenarios)
+            res = await live_runner.run_live_benchmark(scenarios_count=args.scenarios, context_mode=args.context_mode)
             print("\nLive Benchmark Results:")
             for s in res["summaries"]:
                 print(f"  |-- [{s['agent_name']}] ({s['provider']}/{s['model']})")
@@ -163,13 +180,13 @@ def main():
                 print(f"  |   |-- Hallucination:    {s['hallucination_rate']}%")
                 print(f"  |   |-- P50 Latency:      {s['p50_latency_ms']} ms")
                 print(f"  |   |-- Token Usage:      {s['total_input_tokens']} in / {s['total_output_tokens']} out")
-                print(f"  |   +-- Total Cost:       ${s['total_cost_usd']:.4f}")
-            print("\n  +-- Phase 3 Report: benchmarks/reports/PHASE_3_LLM_REPORT.md\n")
+                print(f"  |   +-- Total Cost:       {s['total_cost_usd_display']}")
+            print("\n  +-- Phase 3.1 Report: benchmarks/reports/PHASE_3_1_LOW_RESOURCE_REPORT.md\n")
 
         asyncio.run(_run_live())
 
     elif args.command == "benchmark" and args.subcommand == "live-report":
-        report_file = os.path.join(root_dir, "benchmarks", "reports", "PHASE_3_LLM_REPORT.md")
+        report_file = os.path.join(root_dir, "benchmarks", "reports", "PHASE_3_1_LOW_RESOURCE_REPORT.md")
         if os.path.exists(report_file):
             print("\n" + open(report_file, encoding="utf-8").read())
         else:
@@ -181,7 +198,7 @@ def main():
             cursor = conn.cursor()
             cursor.execute("SELECT * FROM llm_benchmark_traces WHERE run_id = ? LIMIT 5", (args.run_id,))
             rows = [dict(r) for r in cursor.fetchall()]
-            print(f"\n🔍 Live Traces for Run ID '{args.run_id}':")
+            print(f"\nLive Traces for Run ID '{args.run_id}':")
             print(json.dumps(rows, indent=2))
 
     else:

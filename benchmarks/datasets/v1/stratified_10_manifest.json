@@ -1,0 +1,26 @@
+{
+  "dataset_version": "1.0.0",
+  "sample_size": 10,
+  "sampling_method": "deterministic_stratified_10",
+  "dataset_v1_sha256": "2ba2719180060804d7a6fdaf0fd132e27ccb1e78f0a54ec8adff6855f57b12fa",
+  "category_breakdown": {
+    "memory_decay": 2,
+    "temporal_conflict": 2,
+    "entity_disambiguation": 2,
+    "multi_hop_relationship": 2,
+    "contradiction_conflict": 1,
+    "missing_information": 1
+  },
+  "scenario_ids": [
+    "scen_601",
+    "scen_602",
+    "scen_1",
+    "scen_2",
+    "scen_201",
+    "scen_202",
+    "scen_401",
+    "scen_402",
+    "scen_751",
+    "scen_901"
+  ]
+}
