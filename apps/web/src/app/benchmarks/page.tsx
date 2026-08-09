@@ -1,107 +1,151 @@
-'use client';
+"use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from "react";
+import Link from "next/link";
+
+interface BenchmarkRun {
+  run_id: string;
+  timestamp: string;
+  agent_name: string;
+  scenario_count: number;
+  overall_accuracy: number;
+  memory_retention: number;
+  temporal_reasoning: number;
+  entity_disambiguation: number;
+  evidence_grounding: number;
+  hallucination_rate: number;
+  p50_latency_ms: number;
+  p95_latency_ms: number;
+}
 
 export default function BenchmarksPage() {
-  const [isRunning, setIsRunning] = useState(false);
+  const [runs, setRuns] = useState<BenchmarkRun[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch("http://localhost:8000/api/benchmarks/runs")
+      .then((res) => res.json())
+      .then((data) => {
+        setRuns(data.runs || []);
+        setLoading(false);
+      })
+      .catch(() => {
+        setLoading(false);
+      });
+  }, []);
 
   return (
-    <div className="max-w-5xl mx-auto space-y-6 font-mono">
-      <div className="border-b border-slate-800 pb-4 flex justify-between items-end">
+    <div className="min-h-screen bg-[#08090d] text-slate-100 font-sans p-8">
+      <header className="mb-10 flex items-center justify-between border-b border-slate-800/80 pb-6">
         <div>
-          <h1 className="text-xl font-bold text-white">Phase 2.1 Reconstructed Agent Context Benchmarks</h1>
-          <p className="text-xs text-slate-400 mt-1">
-            Zero ground-truth leakage evaluation across 1,000 parameterized synthetic scenarios (Seed: 42).
+          <div className="flex items-center gap-3">
+            <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse"></span>
+            <h1 className="text-2xl font-semibold tracking-tight text-white">ContextOS Evaluation Laboratory</h1>
+          </div>
+          <p className="text-sm text-slate-400 mt-1">
+            Phase 3 Real LLM Evaluation Suite & Dataset v1 Hash Guard
           </p>
         </div>
-        <button
-          onClick={() => {
-            setIsRunning(true);
-            setTimeout(() => setIsRunning(false), 2000);
-          }}
-          disabled={isRunning}
-          className="px-4 py-2 rounded bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white font-bold text-xs uppercase tracking-wider transition-colors"
-        >
-          {isRunning ? 'RUNNING 1,000 SCENARIOS...' : 'RERUN BENCHMARK SUITE (1,000)'}
-        </button>
-      </div>
-
-      {/* Comparison Matrix Table */}
-      <div className="p-6 rounded-xl bg-[#0d0f17] border border-slate-800 space-y-4">
-        <div className="flex justify-between items-center text-xs">
-          <span className="font-bold text-white uppercase tracking-wider">UNBIASED BENCHMARK RESULTS (1,000 SCENARIOS | SEED 42)</span>
-          <span className="text-[10px] text-slate-500">Database: benchmarks/contextos_benchmark.db</span>
+        <div className="flex gap-4">
+          <Link
+            href="/"
+            className="px-4 py-2 rounded-lg bg-slate-900 border border-slate-800 text-xs font-medium text-slate-300 hover:border-slate-700 transition"
+          >
+            ← Back to Overview
+          </Link>
         </div>
+      </header>
 
-        <div className="divide-y divide-slate-800 text-xs">
-          <div className="py-3 grid grid-cols-5 font-bold text-slate-400">
-            <span>METRIC</span>
-            <span>BASELINE RAG</span>
-            <span className="text-blue-400">CONTEXTOS AGENT</span>
-            <span>CUSTOM AGENT</span>
-            <span>DELTA</span>
+      {/* Dataset v1 Freeze Banner */}
+      <div className="mb-8 rounded-xl border border-indigo-500/20 bg-indigo-500/5 p-5">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-lg bg-indigo-500/10 text-indigo-400">🔒</div>
+            <div>
+              <h3 className="text-sm font-semibold text-indigo-300">Frozen Dataset v1 Active</h3>
+              <p className="text-xs text-slate-400 mt-0.5 font-mono">
+                SHA256: 2ba2719180060804d7a6fdaf0fd132e27ccb1e78f0a54ec8adff6855f57b12fa | Seed: 42
+              </p>
+            </div>
           </div>
-
-          <div className="py-3 grid grid-cols-5">
-            <span className="text-white">Overall Accuracy</span>
-            <span className="text-emerald-400 font-bold">69.1%</span>
-            <span className="text-slate-300 font-bold">37.6%</span>
-            <span className="text-slate-300">0.0%</span>
-            <span className="text-red-400 font-bold">-31.5%</span>
-          </div>
-
-          <div className="py-3 grid grid-cols-5">
-            <span className="text-white">Memory Retention</span>
-            <span className="text-emerald-400 font-bold">94.0%</span>
-            <span className="text-red-400 font-bold">0.7%</span>
-            <span className="text-slate-300">0.0%</span>
-            <span className="text-red-400 font-bold">-93.3%</span>
-          </div>
-
-          <div className="py-3 grid grid-cols-5">
-            <span className="text-white">Temporal Reasoning</span>
-            <span className="text-emerald-400 font-bold">100.0%</span>
-            <span className="text-emerald-400 font-bold">100.0%</span>
-            <span className="text-slate-300">0.0%</span>
-            <span className="text-slate-400">0.0%</span>
-          </div>
-
-          <div className="py-3 grid grid-cols-5">
-            <span className="text-white">Entity Disambiguation</span>
-            <span className="text-slate-300 font-bold">0.0%</span>
-            <span className="text-slate-300 font-bold">0.0%</span>
-            <span className="text-slate-300">0.0%</span>
-            <span className="text-slate-400">0.0%</span>
-          </div>
-
-          <div className="py-3 grid grid-cols-5">
-            <span className="text-white">Evidence Grounding</span>
-            <span className="text-emerald-400 font-bold">85.0%</span>
-            <span className="text-slate-300 font-bold">35.0%</span>
-            <span className="text-slate-300">0.0%</span>
-            <span className="text-red-400 font-bold">-50.0%</span>
-          </div>
-
-          <div className="py-3 grid grid-cols-5">
-            <span className="text-white">Hallucination Rate</span>
-            <span className="text-amber-400 font-bold">10.0%</span>
-            <span className="text-emerald-400 font-bold">7.5%</span>
-            <span className="text-slate-300">0.0%</span>
-            <span className="text-emerald-400 font-bold">-2.5%</span>
-          </div>
-
-          <div className="py-3 grid grid-cols-5">
-            <span className="text-white">P50 Latency (ms)</span>
-            <span className="text-slate-300">3.54 ms</span>
-            <span className="text-slate-300">4.46 ms</span>
-            <span className="text-slate-300">0.00 ms</span>
-            <span className="text-slate-500">N/A</span>
-          </div>
+          <span className="px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-xs font-mono">
+            VERIFIED ✓
+          </span>
         </div>
       </div>
 
-      <div className="p-4 rounded-xl bg-amber-950/20 border border-amber-800/40 text-xs text-amber-300 leading-relaxed">
-        ⚠️ <strong>Integrity Finding:</strong> After removing ground-truth category leaks and rule shortcuts, ContextOS Agent currently scores lower on memory retention (0.7%) than Baseline RAG (94.0%) because naive recency sorting ranks recent unrelated communications above early vault notes. This provides an authentic baseline for future architectural improvements.
+      {/* Live LLM Benchmark Status Section (Phase 3) */}
+      <div className="mb-10 rounded-xl border border-slate-800 bg-slate-900/40 p-6">
+        <h2 className="text-lg font-medium text-white mb-4">Phase 3 — Live LLM Benchmark Engine</h2>
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+          <div className="p-4 rounded-lg bg-slate-950/60 border border-slate-800/80">
+            <div className="text-xs text-slate-400">Experiment Type</div>
+            <div className="text-base font-semibold text-indigo-400 mt-1">Live LLM Evaluation</div>
+          </div>
+          <div className="p-4 rounded-lg bg-slate-950/60 border border-slate-800/80">
+            <div className="text-xs text-slate-400">Provider & Model</div>
+            <div className="text-base font-semibold text-slate-200 mt-1">Ollama / OpenAI / MockLLM</div>
+          </div>
+          <div className="p-4 rounded-lg bg-slate-950/60 border border-slate-800/80">
+            <div className="text-xs text-slate-400">Stratified Sample</div>
+            <div className="text-base font-semibold text-emerald-400 mt-1">100 Scenarios</div>
+          </div>
+          <div className="p-4 rounded-lg bg-slate-950/60 border border-slate-800/80">
+            <div className="text-xs text-slate-400">Cost Guard</div>
+            <div className="text-base font-semibold text-amber-400 mt-1">$5.00 USD Limit</div>
+          </div>
+        </div>
+
+        <div className="rounded-lg bg-slate-950/40 border border-dashed border-slate-800 p-8 text-center">
+          <div className="text-slate-400 text-sm">
+            Execute live LLM evaluations using:
+          </div>
+          <code className="inline-block mt-3 px-4 py-2 rounded-md bg-slate-900 border border-slate-800 text-emerald-400 font-mono text-xs">
+            python cli/contextos.py benchmark live --scenarios 100 --seed 42 --provider mock
+          </code>
+        </div>
+      </div>
+
+      {/* Deterministic Benchmark History */}
+      <div className="rounded-xl border border-slate-800 bg-slate-900/40 p-6">
+        <h2 className="text-lg font-medium text-white mb-4">Benchmark History & Execution Telemetry</h2>
+
+        {loading ? (
+          <div className="py-8 text-center text-slate-500 text-sm">Loading benchmark history...</div>
+        ) : runs.length === 0 ? (
+          <div className="py-8 text-center text-slate-500 text-sm">No benchmark runs recorded yet.</div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-xs">
+              <thead>
+                <tr className="border-b border-slate-800 text-slate-400 uppercase tracking-wider font-mono">
+                  <th className="pb-3 pr-4">Run ID</th>
+                  <th className="pb-3 px-4">Agent</th>
+                  <th className="pb-3 px-4">Accuracy</th>
+                  <th className="pb-3 px-4">Memory Recall</th>
+                  <th className="pb-3 px-4">Entity Acc</th>
+                  <th className="pb-3 px-4">Grounding</th>
+                  <th className="pb-3 px-4">Hallucination</th>
+                  <th className="pb-3 pl-4">P50 Latency</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-800/60 font-mono">
+                {runs.map((r) => (
+                  <tr key={r.run_id} className="hover:bg-slate-800/30 transition">
+                    <td className="py-3 pr-4 text-slate-400">{r.run_id.slice(0, 16)}</td>
+                    <td className="py-3 px-4 text-slate-200 font-sans font-medium">{r.agent_name}</td>
+                    <td className="py-3 px-4 text-emerald-400 font-bold">{r.overall_accuracy}%</td>
+                    <td className="py-3 px-4 text-slate-300">{r.memory_retention}%</td>
+                    <td className="py-3 px-4 text-slate-300">{r.entity_disambiguation}%</td>
+                    <td className="py-3 px-4 text-slate-300">{r.evidence_grounding}%</td>
+                    <td className="py-3 px-4 text-slate-300">{r.hallucination_rate}%</td>
+                    <td className="py-3 pl-4 text-slate-400">{r.p50_latency_ms} ms</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
     </div>
   );

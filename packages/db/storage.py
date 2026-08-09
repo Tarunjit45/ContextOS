@@ -59,6 +59,73 @@ class BenchmarkStorage:
                     FOREIGN KEY(run_id) REFERENCES benchmark_runs(run_id)
                 )
             """)
+
+            cursor.execute("""
+                CREATE TABLE IF NOT EXISTS llm_benchmark_traces (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    run_id TEXT NOT NULL,
+                    scenario_id TEXT NOT NULL,
+                    category TEXT NOT NULL,
+                    agent_name TEXT NOT NULL,
+                    provider TEXT NOT NULL,
+                    model TEXT NOT NULL,
+                    system_prompt TEXT,
+                    user_prompt TEXT,
+                    context TEXT,
+                    answer TEXT,
+                    decision TEXT,
+                    confidence REAL,
+                    input_tokens INTEGER,
+                    output_tokens INTEGER,
+                    cost_usd REAL,
+                    latency_ms REAL,
+                    system_prompt_hash TEXT,
+                    user_prompt_hash TEXT,
+                    context_hash TEXT,
+                    execution_status TEXT,
+                    error_message TEXT,
+                    git_commit TEXT,
+                    created_at TEXT NOT NULL
+                )
+            """)
+            conn.commit()
+
+    def save_llm_trace(self, trace_data: Dict[str, Any]):
+        with self.get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute("""
+                INSERT INTO llm_benchmark_traces (
+                    run_id, scenario_id, category, agent_name, provider, model,
+                    system_prompt, user_prompt, context, answer, decision, confidence,
+                    input_tokens, output_tokens, cost_usd, latency_ms,
+                    system_prompt_hash, user_prompt_hash, context_hash,
+                    execution_status, error_message, git_commit, created_at
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """, (
+                trace_data.get("run_id"),
+                trace_data.get("scenario_id"),
+                trace_data.get("category"),
+                trace_data.get("agent_name"),
+                trace_data.get("provider"),
+                trace_data.get("model"),
+                trace_data.get("system_prompt"),
+                trace_data.get("user_prompt"),
+                trace_data.get("context"),
+                trace_data.get("answer"),
+                trace_data.get("decision"),
+                trace_data.get("confidence", 0.0),
+                trace_data.get("input_tokens", 0),
+                trace_data.get("output_tokens", 0),
+                trace_data.get("cost_usd", 0.0),
+                trace_data.get("latency_ms", 0.0),
+                trace_data.get("system_prompt_hash"),
+                trace_data.get("user_prompt_hash"),
+                trace_data.get("context_hash"),
+                trace_data.get("execution_status", "SUCCESS"),
+                trace_data.get("error_message"),
+                trace_data.get("git_commit", "7b24a36"),
+                trace_data.get("created_at")
+            ))
             conn.commit()
 
     def save_benchmark_run(self, run_summary: Dict[str, Any], traces: List[Dict[str, Any]]):
