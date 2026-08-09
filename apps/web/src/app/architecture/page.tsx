@@ -2,17 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-
-interface SubsystemDetail {
-  id: string;
-  name: string;
-  module: string;
-  purpose: string;
-  input: string;
-  output: string;
-  failureClass: string;
-  specification: string;
-}
+import NodeInspector, { SubsystemDetail } from '../../components/architecture/NodeInspector';
 
 const SUBSYSTEMS: SubsystemDetail[] = [
   {
@@ -37,13 +27,13 @@ const SUBSYSTEMS: SubsystemDetail[] = [
   },
   {
     id: 'temporal_state',
-    name: 'TEMPORAL STATE RESOLUTION',
+    name: 'TEMPORAL STATE RESOLVER',
     module: 'packages.retrieval.temporal_resolver.TemporalStateResolver',
     purpose: 'Parses communications into discrete state transition events to reconstruct active attribute values valid at query timestamp.',
     input: 'Candidate communications, Target entity ID, Attribute name, Query timestamp',
     output: 'Active attribute state payload, valid_from / valid_until interval, and superseded event IDs',
-    failureClass: 'TEMPORAL_FAILURE',
-    specification: 'ActiveState(T) = argmax_{e in Events(T)} (valid_from_e, authority_e, confidence_e). Superseded events are tracked in provenance.'
+    failureClass: 'TEMPORAL_RETRIEVAL_FAILURE',
+    specification: 'ActiveState(T) = argmax_{e in Events(T)} (valid_from_e, authority_e, confidence_e). Superseded events tracked in provenance.'
   },
   {
     id: 'memory_ranking',
@@ -52,7 +42,7 @@ const SUBSYSTEMS: SubsystemDetail[] = [
     purpose: 'Ranks historical facts using relevance and intrinsic importance over pure chronological recency to retain critical early instructions.',
     input: 'Candidate evidence items, Query text, Time horizon delta',
     output: 'Re-ordered evidence array prioritized by Importance + Relevance > Recency',
-    failureClass: 'MEMORY_FAILURE',
+    failureClass: 'MEMORY_DECAY_FAILURE',
     specification: 'MemoryScore = 0.50*RelevanceScore + 0.35*ImportanceWeight + 0.15*DecayPenalty(t_gap)'
   },
   {
@@ -62,7 +52,7 @@ const SUBSYSTEMS: SubsystemDetail[] = [
     purpose: 'Executes multi-hop graph path expansion across entity-project-meeting-decision relationships in NetworkX.',
     input: 'Resolved Entity IDs, Workspace NetworkX MultiDiGraph, Max Depth (2)',
     output: 'Sub-graph edge path array (e.g. Person p_1 -> Project proj_1001 -> Decision d_4)',
-    failureClass: 'RELATIONSHIP_FAILURE',
+    failureClass: 'MULTI_HOP_RELATIONSHIP_FAILURE',
     specification: 'Traverses edges (OWNS, BELONGS_TO, PARTICIPATED_IN, DECIDED) up to depth=2 with edge weight decay.'
   },
   {
@@ -78,141 +68,71 @@ const SUBSYSTEMS: SubsystemDetail[] = [
 ];
 
 export default function ArchitecturePage() {
-  const [selectedNode, setSelectedNode] = useState<SubsystemDetail>(SUBSYSTEMS[0]);
+  const [selectedNode, setSelectedNode] = useState<SubsystemDetail>(SUBSYSTEMS[2]);
 
   return (
-    <div className="space-y-10 font-sans">
-      {/* Page Title & Subtitle */}
-      <div className="border-b border-[#252A31] pb-6 flex justify-between items-start">
+    <div className="space-y-8 font-sans">
+      {/* Header */}
+      <div className="border-b border-[#232731] pb-6 flex justify-between items-start">
         <div>
-          <h1 className="text-3xl font-semibold text-[#F4F5F7] tracking-tight">ARCHITECTURE</h1>
-          <p className="text-[#9BA3AF] text-sm mt-1">From retrieval to decision-grade context.</p>
+          <h1 className="text-2xl font-semibold text-[#F5F7FA] tracking-tight">ARCHITECTURE</h1>
+          <p className="text-[#A7ADB8] text-sm mt-1">From retrieval to decision-grade context compilation.</p>
         </div>
         <Link
           href="/"
-          className="px-4 py-2 rounded-lg bg-[#15181D] border border-[#252A31] text-xs font-mono text-[#9BA3AF] hover:text-[#F4F5F7] transition-colors"
+          className="px-3 py-1.5 rounded-md bg-[#111318] border border-[#232731] text-xs font-mono text-[#A7ADB8] hover:text-[#F5F7FA] transition-colors"
         >
           ← Overview
         </Link>
       </div>
 
-      {/* PIPELINE ARCHITECTURE DIAGRAM (INTERACTIVE NODES) */}
-      <div className="space-y-6">
-        <div className="flex items-center justify-between font-mono text-xs">
-          <span className="text-[#66707D] font-bold uppercase tracking-wider">PIPELINE DIAGRAM (CLICK NODE TO INSPECT)</span>
+      {/* PIPELINE ARCHITECTURE (DOMINANT VIEW) */}
+      <div className="space-y-4 font-mono text-xs">
+        <div className="flex items-center justify-between text-[#6B7280]">
+          <span className="font-bold uppercase tracking-wider">CONTEXT COMPILATION PIPELINE (CLICK NODE TO INSPECT)</span>
           <span className="text-[#7C5CFC]">SELECTED: {selectedNode.name}</span>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {/* BASELINE RAG PIPELINE */}
-          <div className="p-6 rounded-lg bg-[#111419] border border-[#EF4444]/30 space-y-4 font-mono text-xs">
-            <div className="flex justify-between items-center border-b border-[#252A31] pb-3">
-              <span className="font-bold text-[#9BA3AF]">BASELINE RAG</span>
-              <span className="text-[10px] text-[#EF4444]">UNCOMPILED CONTEXT</span>
-            </div>
-
-            <div className="space-y-2 text-center text-[#9BA3AF]">
-              <div className="p-3 rounded-lg bg-[#15181D] border border-[#252A31] font-bold text-[#F4F5F7]">QUERY</div>
-              <div className="text-[#66707D]">↓</div>
-              <div className="p-3 rounded-lg bg-[#15181D] border border-[#252A31]">BM25</div>
-              <div className="text-[#66707D]">↓</div>
-              <div className="p-3 rounded-lg bg-[#15181D] border border-[#EF4444]/40 text-[#EF4444]">TOP-K EVIDENCE</div>
-              <div className="text-[#66707D]">↓</div>
-              <div className="p-3 rounded-lg bg-[#15181D] border border-[#EF4444]/50 text-[#EF4444] font-bold">LLM SYSTEM PROMPT</div>
-            </div>
+        <div className="p-6 rounded-lg bg-[#111318] border border-[#232731] space-y-3 text-center">
+          <div className="p-3 rounded-md bg-[#171A20] border border-[#232731] font-bold text-[#F5F7FA] max-w-sm mx-auto">
+            User Query
           </div>
+          <div className="text-[#7C5CFC] font-bold">↓</div>
 
-          {/* CONTEXTOS PIPELINE (INTERACTIVE) */}
-          <div className="p-6 rounded-lg bg-[#111419] border border-[#7C5CFC]/40 space-y-4 font-mono text-xs">
-            <div className="flex justify-between items-center border-b border-[#252A31] pb-3">
-              <span className="font-bold text-[#7C5CFC]">CONTEXTOS COMPILER</span>
-              <span className="text-[10px] text-[#22C55E] font-bold">DECISION-GRADE</span>
-            </div>
+          {SUBSYSTEMS.map((sub) => {
+            const isSelected = selectedNode.id === sub.id;
+            return (
+              <React.Fragment key={sub.id}>
+                <button
+                  onClick={() => setSelectedNode(sub)}
+                  className={`w-full max-w-xl p-3.5 rounded-md border text-left transition-all font-mono text-xs mx-auto block ${
+                    isSelected
+                      ? 'bg-[#7C5CFC]/15 border-[#7C5CFC] text-[#F5F7FA] font-bold shadow-sm'
+                      : 'bg-[#171A20] border-[#232731] text-[#A7ADB8] hover:border-[#A7ADB8] hover:text-[#F5F7FA]'
+                  }`}
+                >
+                  <div className="flex items-center justify-between">
+                    <span>{sub.name}</span>
+                    {isSelected ? (
+                      <span className="text-[#7C5CFC] text-[10px]">● INSPECTING</span>
+                    ) : (
+                      <span className="text-[#6B7280] text-[10px]">{sub.failureClass}</span>
+                    )}
+                  </div>
+                </button>
+                <div className="text-[#7C5CFC] font-bold">↓</div>
+              </React.Fragment>
+            );
+          })}
 
-            <div className="space-y-2 text-center">
-              <div className="p-3 rounded-lg bg-[#15181D] border border-[#252A31] font-bold text-[#F4F5F7]">QUERY</div>
-              <div className="text-[#7C5CFC]">↓</div>
-
-              {SUBSYSTEMS.map((sub) => {
-                const isSelected = selectedNode.id === sub.id;
-                return (
-                  <React.Fragment key={sub.id}>
-                    <button
-                      onClick={() => setSelectedNode(sub)}
-                      className={`w-full p-3 rounded-lg border text-left transition-all font-mono text-xs ${
-                        isSelected
-                          ? 'bg-[#7C5CFC]/15 border-[#7C5CFC] text-[#F4F5F7] font-bold shadow-sm'
-                          : 'bg-[#15181D] border-[#252A31] text-[#9BA3AF] hover:border-[#9BA3AF] hover:text-[#F4F5F7]'
-                      }`}
-                    >
-                      <div className="flex items-center justify-between">
-                        <span>{sub.name}</span>
-                        {isSelected && <span className="text-[#7C5CFC] text-[10px]">● INSPECTING</span>}
-                      </div>
-                    </button>
-                    <div className="text-[#7C5CFC]">↓</div>
-                  </React.Fragment>
-                );
-              })}
-
-              <div className="p-3 rounded-lg bg-[#15181D] border border-[#22C55E]/50 text-[#22C55E] font-bold">
-                LLM SYSTEM PROMPT (-93.6% TOKENS)
-              </div>
-            </div>
+          <div className="p-3.5 rounded-md bg-[#171A20] border border-[#32D583]/50 text-[#32D583] font-bold max-w-sm mx-auto">
+            LLM System Prompt (-93.6% Tokens)
           </div>
         </div>
       </div>
 
-      {/* NODE INSPECTOR PANEL */}
-      <div className="p-6 rounded-lg bg-[#111419] border border-[#7C5CFC]/40 space-y-4">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-2 border-b border-[#252A31] pb-3">
-          <div className="flex items-center gap-3 font-mono">
-            <span className="w-2.5 h-2.5 rounded bg-[#7C5CFC]" />
-            <h3 className="text-lg font-semibold text-[#F4F5F7]">{selectedNode.name}</h3>
-          </div>
-          <code className="text-xs text-[#9BA3AF] font-mono bg-[#15181D] px-2.5 py-1 rounded border border-[#252A31]">
-            {selectedNode.module}
-          </code>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-xs font-sans">
-          {/* PURPOSE */}
-          <div className="space-y-1">
-            <span className="font-mono text-[10px] font-bold text-[#66707D] uppercase tracking-widest block">PURPOSE</span>
-            <p className="text-[#F4F5F7] leading-relaxed">{selectedNode.purpose}</p>
-          </div>
-
-          {/* FAILURE CLASS ADDRESSED */}
-          <div className="space-y-1">
-            <span className="font-mono text-[10px] font-bold text-[#F59E0B] uppercase tracking-widest block">FAILURE CLASS ADDRESSED</span>
-            <p className="text-[#F59E0B] font-mono font-bold">{selectedNode.failureClass}</p>
-          </div>
-
-          {/* INPUT */}
-          <div className="space-y-1">
-            <span className="font-mono text-[10px] font-bold text-[#66707D] uppercase tracking-widest block">INPUT</span>
-            <code className="text-[#9BA3AF] font-mono text-[11px] block bg-[#15181D] p-3 rounded border border-[#252A31]">
-              {selectedNode.input}
-            </code>
-          </div>
-
-          {/* OUTPUT */}
-          <div className="space-y-1">
-            <span className="font-mono text-[10px] font-bold text-[#66707D] uppercase tracking-widest block">OUTPUT</span>
-            <code className="text-[#22C55E] font-mono text-[11px] block bg-[#15181D] p-3 rounded border border-[#252A31]">
-              {selectedNode.output}
-            </code>
-          </div>
-        </div>
-
-        {/* ALGORITHMIC SPECIFICATION */}
-        <div className="pt-3 border-t border-[#252A31] font-mono text-xs">
-          <span className="text-[#66707D] text-[10px] font-bold uppercase tracking-widest block mb-1">MATHEMATICAL / ALGORITHMIC SPECIFICATION</span>
-          <div className="bg-[#15181D] p-3.5 rounded text-[#38BDF8] border border-[#252A31]">
-            {selectedNode.specification}
-          </div>
-        </div>
-      </div>
+      {/* SELECTED COMPONENT INSPECTOR */}
+      <NodeInspector node={selectedNode} />
     </div>
   );
 }

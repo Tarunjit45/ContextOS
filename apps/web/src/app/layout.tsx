@@ -1,7 +1,6 @@
 import React from 'react';
 import '../index.css';
-import Sidebar from '../components/layout/Sidebar';
-import TopBar from '../components/layout/TopBar';
+import AppShell from '../components/layout/AppShell';
 
 export const metadata = {
   title: 'ContextOS — Agent Memory & Context Evaluation Laboratory',
@@ -15,16 +14,8 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className="dark">
-      <body className="bg-[#08090B] text-[#F4F5F7] font-sans antialiased selection:bg-[#7C5CFC] selection:text-white min-h-screen flex flex-col">
-        <TopBar />
-        <div className="flex flex-1 overflow-hidden">
-          <Sidebar />
-          <main className="flex-1 overflow-y-auto bg-[#08090B] p-6 lg:p-8 flex justify-center">
-            <div className="w-full max-w-[1400px]">
-              {children}
-            </div>
-          </main>
-        </div>
+      <body>
+        <AppShell>{children}</AppShell>
       </body>
     </html>
   );

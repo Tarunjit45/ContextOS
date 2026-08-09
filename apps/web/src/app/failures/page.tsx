@@ -2,6 +2,8 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import FailureSummary from '../../components/failures/FailureSummary';
+import FailureDistribution from '../../components/failures/FailureDistribution';
 import FailureCard from '../../components/failures/FailureCard';
 
 interface FailureClassDetail {
@@ -146,26 +148,32 @@ export default function FailureAnalysisPage() {
   const [selectedClass, setSelectedClass] = useState<FailureClassDetail>(FAILURE_CLASSES[0]);
 
   return (
-    <div className="space-y-10 font-sans text-[#F4F5F7]">
+    <div className="space-y-8 font-sans text-[#F5F7FA]">
       {/* Header */}
-      <div className="border-b border-[#252A31] pb-6 flex justify-between items-start font-mono">
+      <div className="border-b border-[#232731] pb-6 flex justify-between items-start font-mono">
         <div>
-          <h1 className="text-3xl font-semibold text-[#F4F5F7] tracking-tight">FAILURE ANALYSIS</h1>
-          <p className="text-sm text-[#9BA3AF] mt-1 font-sans">
+          <h1 className="text-2xl font-semibold text-[#F5F7FA] tracking-tight">Failure Analysis</h1>
+          <p className="text-sm text-[#A7ADB8] mt-1 font-sans">
             Where agent context pipelines break.
           </p>
         </div>
         <Link
           href="/"
-          className="px-4 py-2 rounded-lg bg-[#15181D] border border-[#252A31] text-xs text-[#9BA3AF] hover:text-[#F4F5F7] transition-colors"
+          className="px-3 py-1.5 rounded-md bg-[#111318] border border-[#232731] text-xs text-[#A7ADB8] hover:text-[#F5F7FA] transition-colors"
         >
           ← Overview
         </Link>
       </div>
 
-      {/* FAILURE CLASSES GRID */}
+      {/* Top Metrics */}
+      <FailureSummary />
+
+      {/* Failure Distribution */}
+      <FailureDistribution />
+
+      {/* Failure Classes Grid */}
       <div className="space-y-4 font-mono text-xs">
-        <div className="text-[#66707D] font-bold uppercase tracking-wider">DIAGNOSTIC FAILURE CLASSES</div>
+        <div className="text-[#6B7280] font-bold uppercase tracking-wider">DIAGNOSTIC FAILURE CLASSES</div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {FAILURE_CLASSES.map((fc) => (
@@ -182,49 +190,49 @@ export default function FailureAnalysisPage() {
         </div>
       </div>
 
-      {/* SELECTED FAILURE CLASS REPRESENTATIVE SCENARIOS */}
-      <div className="p-6 rounded-lg bg-[#111419] border border-[#7C5CFC]/40 space-y-6">
-        <div className="flex justify-between items-center border-b border-[#252A31] pb-4 font-mono text-xs">
+      {/* Selected Failure Class Case Study */}
+      <div className="p-6 rounded-lg bg-[#111318] border border-[#7C5CFC]/40 space-y-6">
+        <div className="flex justify-between items-center border-b border-[#232731] pb-4 font-mono text-xs">
           <div>
             <span className="text-[#7C5CFC] font-bold">REPRESENTATIVE CASES: {selectedClass.name}</span>
-            <div className="text-[#9BA3AF] font-sans text-xs mt-0.5">{selectedClass.explanation}</div>
+            <div className="text-[#A7ADB8] font-sans text-xs mt-0.5">{selectedClass.explanation}</div>
           </div>
-          <span className="px-2.5 py-1 rounded bg-[#EF4444]/10 text-[#EF4444] border border-[#EF4444]/20 font-bold">
-            DIAGNOSTIC TRACE
+          <span className="px-2.5 py-1 rounded bg-[#F97066]/10 text-[#F97066] border border-[#F97066]/20 font-bold">
+            HUMAN-READABLE DIAGNOSIS
           </span>
         </div>
 
         <div className="space-y-6 font-mono text-xs">
           {selectedClass.cases.map((c) => (
-            <div key={c.id} className="p-5 rounded-lg bg-[#15181D] border border-[#252A31] space-y-4">
+            <div key={c.id} className="p-5 rounded-lg bg-[#171A20] border border-[#232731] space-y-4">
               <div className="flex justify-between items-center text-xs">
                 <span className="font-bold text-[#7C5CFC]">{c.id}</span>
-                <span className="text-[#9BA3AF]">{selectedClass.key}</span>
+                <span className="text-[#A7ADB8]">{selectedClass.key}</span>
               </div>
 
               <div className="space-y-1 font-sans">
-                <span className="font-mono text-[10px] text-[#66707D] uppercase font-bold block">SCENARIO QUERY</span>
-                <div className="text-base font-semibold text-[#F4F5F7]">"{c.query}"</div>
-                <div className="text-xs text-[#9BA3AF] font-mono mt-1">
-                  Expected: <span className="text-[#22C55E] font-bold">{c.expected}</span>
+                <span className="font-mono text-[10px] text-[#6B7280] uppercase font-bold block">SCENARIO QUERY</span>
+                <div className="text-base font-semibold text-[#F5F7FA]">"{c.query}"</div>
+                <div className="text-xs text-[#A7ADB8] font-mono mt-1">
+                  Expected: <span className="text-[#32D583] font-bold">{c.expected}</span>
                 </div>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
-                <div className="p-3.5 rounded bg-[#111419] border border-[#EF4444]/40 space-y-1">
-                  <div className="text-[#EF4444] font-bold text-[11px]">BASELINE RAG RESULT</div>
-                  <div className="text-[#EF4444]">{c.baseline}</div>
+                <div className="p-3.5 rounded bg-[#111318] border border-[#F97066]/40 space-y-1">
+                  <div className="text-[#F97066] font-bold text-[11px]">OBSERVED BASELINE RESULT</div>
+                  <div className="text-[#F97066]">{c.baseline}</div>
                 </div>
 
-                <div className="p-3.5 rounded bg-[#111419] border border-[#22C55E]/40 space-y-1">
-                  <div className="text-[#22C55E] font-bold text-[11px]">CONTEXTOS COMPACT RESULT</div>
-                  <div className="text-[#22C55E]">{c.contextos}</div>
+                <div className="p-3.5 rounded bg-[#111318] border border-[#32D583]/40 space-y-1">
+                  <div className="text-[#32D583] font-bold text-[11px]">CONTEXTOS COMPACT RESULT</div>
+                  <div className="text-[#32D583]">{c.contextos}</div>
                 </div>
               </div>
 
-              <div className="p-3.5 rounded bg-[#111419] border border-[#252A31] text-xs font-sans space-y-1">
-                <span className="font-mono text-[10px] font-bold text-[#7C5CFC] uppercase block">TECHNICAL ROOT CAUSE ANALYSIS</span>
-                <p className="text-[#9BA3AF] text-xs leading-relaxed">{c.rootCause}</p>
+              <div className="p-3.5 rounded bg-[#111318] border border-[#232731] text-xs font-sans space-y-1">
+                <span className="font-mono text-[10px] font-bold text-[#7C5CFC] uppercase block">DIAGNOSTIC ROOT CAUSE</span>
+                <p className="text-[#A7ADB8] text-xs leading-relaxed">{c.rootCause}</p>
               </div>
             </div>
           ))}
