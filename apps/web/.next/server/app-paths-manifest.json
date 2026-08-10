@@ -1,10 +1,10 @@
 {
-  "/architecture/page": "app/architecture/page.js",
   "/page": "app/page.js",
+  "/architecture/page": "app/architecture/page.js",
+  "/benchmarks/page": "app/benchmarks/page.js",
   "/evaluations/page": "app/evaluations/page.js",
   "/evaluations/[id]/page": "app/evaluations/[id]/page.js",
-  "/benchmarks/page": "app/benchmarks/page.js",
-  "/failures/page": "app/failures/page.js",
   "/reproducibility/page": "app/reproducibility/page.js",
+  "/failures/page": "app/failures/page.js",
   "/settings/page": "app/settings/page.js"
 }

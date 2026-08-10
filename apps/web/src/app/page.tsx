@@ -3,10 +3,10 @@
 import React from 'react';
 import Link from 'next/link';
 import PipelineDiagram from '../components/architecture/PipelineDiagram';
-import MetricCard from '../components/ui/MetricCard';
 import Button from '../components/ui/Button';
 import Badge from '../components/ui/Badge';
 import InteractiveDemoPlayground from '../components/research/InteractiveDemoPlayground';
+import TryYourOwnContext from '../components/research/TryYourOwnContext';
 import SimpleHowItWorks from '../components/research/SimpleHowItWorks';
 import EvidenceSection from '../components/research/EvidenceSection';
 import HowCanIVerifyIt from '../components/research/HowCanIVerifyIt';
@@ -22,25 +22,30 @@ export default function OverviewPage() {
           <div className="flex items-center gap-3 font-mono text-xs">
             <span className="w-2 h-2 rounded-full bg-[#7C5CFC]" />
             <span className="text-[#7C5CFC] font-bold tracking-wider uppercase">CONTEXTOS</span>
-            <span className="text-[#6B7280]">| Agent Memory Evaluation Laboratory</span>
+            <span className="text-[#6B7280]">| Context Compilation for AI Agents</span>
           </div>
           <h1 className="text-3xl md:text-4xl font-semibold text-[#F5F7FA] tracking-tight max-w-4xl leading-tight">
-            Decision-Grade Context & Memory Compiler for AI Agents.
+            Turn messy memory into decision-ready context.
           </h1>
           <p className="text-[#A7ADB8] text-sm max-w-3xl leading-relaxed">
             ContextOS evaluates structural failure modes that conventional RAG systems miss, including temporal state overrides, memory decay, entity ambiguity, and prompt bloat context composition.
           </p>
+          <div className="flex items-center gap-3 pt-2">
+            <a href="#demo-playground">
+              <Button variant="primary">TRY THE DEMO ↓</Button>
+            </a>
+            <a href="#try-your-own">
+              <Button variant="secondary">TRY YOUR OWN CONTEXT ↓</Button>
+            </a>
+          </div>
         </div>
 
         <div className="flex items-center gap-3 shrink-0">
           <Link href="/benchmarks">
-            <Button variant="primary">RUN BENCHMARK</Button>
-          </Link>
-          <Link href="/evaluations/1247">
-            <Button variant="secondary">VIEW EVALUATION</Button>
+            <Button variant="outline">BENCHMARKS</Button>
           </Link>
           <Link href="/architecture">
-            <Button variant="outline">VIEW ARCHITECTURE</Button>
+            <Button variant="outline">ARCHITECTURE</Button>
           </Link>
         </div>
       </div>
@@ -61,12 +66,17 @@ export default function OverviewPage() {
       </div>
 
       {/* 3. INTERACTIVE DEMO PLAYGROUND */}
-      <InteractiveDemoPlayground />
+      <div id="demo-playground">
+        <InteractiveDemoPlayground />
+      </div>
 
-      {/* 4. EVIDENCE, NOT JUST A DEMO */}
+      {/* 4. TRY YOUR OWN CONTEXT */}
+      <TryYourOwnContext />
+
+      {/* 5. EVIDENCE, NOT JUST A DEMO */}
       <EvidenceSection />
 
-      {/* 5. THE RESEARCH FINDING */}
+      {/* 6. THE RESEARCH FINDING */}
       <div className="p-6 rounded-lg bg-[#111318] border border-[#7C5CFC]/30 space-y-4 font-mono text-xs">
         <div className="flex justify-between items-center">
           <span className="font-bold text-[#7C5CFC] uppercase tracking-wider">CANONICAL RESEARCH FINDING</span>
@@ -110,19 +120,19 @@ export default function OverviewPage() {
         </div>
       </div>
 
-      {/* 6. HOW CONTEXTOS WORKS */}
+      {/* 7. HOW CONTEXTOS WORKS */}
       <SimpleHowItWorks />
 
-      {/* 7. ARCHITECTURE PIPELINE */}
+      {/* 8. ARCHITECTURE PIPELINE */}
       <PipelineDiagram />
 
-      {/* 8. WHAT IT PROVES / DOESN'T PROVE */}
+      {/* 9. WHAT IT PROVES / DOESN'T PROVE */}
       <TrustBoundaryPanel />
 
-      {/* 9. HOW CAN I VERIFY IT? */}
+      {/* 10. HOW CAN I VERIFY IT? */}
       <HowCanIVerifyIt />
 
-      {/* 10. FINAL REPRODUCIBILITY & GITHUB CTA */}
+      {/* 11. FINAL REPRODUCIBILITY & GITHUB CTA */}
       <ReproducibilityCTA />
     </div>
   );
